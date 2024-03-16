@@ -1,0 +1,1 @@
+/home/maxim/OSISP/Spasenov/lab01/test/test.txt
