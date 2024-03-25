@@ -30,6 +30,8 @@
 *.exe
 *.out
 *.app
-dirwalk
-main
-.vscode/
+*/dirwalk
+*/main
+*/.vscode
+*/.idea
+*/bin
