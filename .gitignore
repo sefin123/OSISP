@@ -32,3 +32,4 @@
 *.app
 dirwalk
 main
+.vscode
