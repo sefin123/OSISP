@@ -14,10 +14,10 @@ typedef struct Options{
 Options switchFlags(int argc, char* argv[]) {
     Options options = {false, false, false, false, -1};
     for (int i = 1; i < argc; i++) {
-        if(argv[i][0] != '-') options.basicPath = i;
+        if (argv[i][0] != '-') options.basicPath = i;
     }
 
-    for(int i = 1;i < argc; i++) {
+    for (int i = 1;i < argc; i++) {
         if (argv[i][0] == '-') {
             int j = 1;
             while (argv[i][j] != '\0') {
