@@ -25,7 +25,7 @@ $(OUT_DIR): $(OBJS)
 	@mkdir -p $(dir $(OUT_DIR))
 	$(CC) -o $(OUT_DIR) $^ -lncurses
 
-$(OBJS): $(SRCS)
+$(BUILD_DIST)/%.o: $(SRC)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) -c $(CFLAGS) $< -o $@
 
