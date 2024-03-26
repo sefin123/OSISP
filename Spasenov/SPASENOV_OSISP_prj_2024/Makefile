@@ -14,7 +14,7 @@ ifeq ($(MODE), release)
 	BUILD_DIST=$(RELEASE_DIST)
 endif
 
-SRCS=$(wildcard $(SRC)/**/*.c)
+SRCS=$(wildcard $(SRC)/*.c)
 OBJS=$(patsubst $(SRC)/%.c, $(BUILD_DIST)/%.o, $(SRCS))
 
 .PHONY: all clean
@@ -25,9 +25,14 @@ $(OUT_DIR): $(OBJS)
 	@mkdir -p $(dir $(OUT_DIR))
 	$(CC) -o $(OUT_DIR) $^ -lncurses
 
-$(BUILD_DIST)/%.o : $(SRC)/%.c
+$(OBJS): $(SRCS)
 	@mkdir -p $(dir $@)
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf $(BUILD) $(BIN)
+
+.PHONY: run
+
+run: $(OUT_DIR)
+	$(OUT_DIR)
