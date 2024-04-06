@@ -44,14 +44,16 @@ void printDirectory(const char *path, const char *input, char *results[], int *n
     }
 }
 
-void search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *path, const char *results[]) {
+int search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *path, const char *results[], int selected_index, int cousor_position) {
     int num_results = 0;
     printDirectory(path, input, results, &num_results);
 
     qsort(results, num_results, sizeof(const char *), compare_filenames);
 
-    render_search_window(search_win, input);
-    render_results_window(results_win, results, num_results);
+    render_search_window(search_win, input, cousor_position);
+    render_results_window(results_win, results, num_results, selected_index);
+    
+    return num_results;
 }
 
 void handle_input(WINDOW *search_win, WINDOW *results_win) {
@@ -61,8 +63,9 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
     char *results[MAX_LENGTH];
     int num_results = 0;
     char path[MAX_LENGTH] = ".";
+    int cursor_position = 0;
 
-    search_directory(search_win, results_win, input, path, results);
+    num_results = search_directory(search_win, results_win, input, path, results, 0, cursor_position);
 
     while (true) {
         int ch = wgetch(search_win);
@@ -71,29 +74,50 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
                 return;
             case KEY_BACKSPACE:
                 if (input_length > 0) {
-                    input[--input_length] = '\0';
+                    for (int i = cursor_position; i < input_length; i++) {
+                        input[i - 1] = input[i];
+                    }
+                    input_length--;
+                    cursor_position--;
+                    input[input_length] = '\0';
                 }
                 break;
             case KEY_DOWN:
                 if (selected_index < num_results - 1) {
-                    selected_index++;
-                    render_results_window(results_win, results, num_results);
+                selected_index++;
+                render_results_window(results_win, results, num_results, selected_index);
                 }
                 break;
             case KEY_UP:
                 if (selected_index > 0) {
-                    selected_index--;
-                    render_results_window(results_win, results, num_results);
+                selected_index--;
+                render_results_window(results_win, results, num_results, selected_index);
                 }
                 break;
+            case KEY_LEFT:
+                if (cursor_position > 0) {
+                    cursor_position--;
+                }
+                break;
+            case KEY_RIGHT:
+                if (cursor_position < input_length) {
+                    cursor_position++;
+                }
             default:
                 if (ch >= 32 && ch <= 126 && input_length < MAX_LENGTH - 1) {
-                    input[input_length++] = ch;
+                    for (int i = input_length; i > cursor_position; i--) {
+                        input[i] = input[i - 1];
+                    }
+                    input[cursor_position++] = ch;
+                    input_length++;
                     input[input_length] = '\0';
+                    render_search_window(search_win, input, cursor_position);
                 }
                 break;
-        }
 
-        search_directory(search_win, results_win, input, path, results);
+        render_search_window(search_win, input, cursor_position);
+        }
+            num_results = search_directory(search_win, results_win, input, path, results, selected_index, cursor_position);
+
     }
 }

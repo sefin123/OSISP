@@ -34,4 +34,4 @@ enum
 
 void handle_input(WINDOW *search_win, WINDOW *results_win);
 
-void search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *path, const char *results[]);
+int search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *path, const char *results[], int selected_index, int cousor_position);
