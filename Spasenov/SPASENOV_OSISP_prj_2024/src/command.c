@@ -9,19 +9,44 @@ int compare(const struct dirent **a, const struct dirent **b) {
     return strcmp((*a)->d_name, (*b)->d_name);
 }
 
-void search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *search_dir, const char *results[]) {
-    int num_results = 0;
-        struct dirent **namelist;
-        int n = scandir(search_dir, &namelist, NULL, compare);
-        if (n != -1) {
-            while (n--) {
-                if (strstr(namelist[n]->d_name, input) != NULL) {
-                    results[num_results++] = namelist[n]->d_name;
-                }
-                free(namelist[n]);
+void printDirectory(const char *path, const char *input, char *results[], int *num_results) {
+    struct dirent **dir;
+    int n = scandir(path, &dir, NULL, compare);
+
+    if (n != -1) {
+        while (n--) {
+            if (strcmp(dir[n]->d_name, ".") == 0 || strcmp(dir[n]->d_name, "..") == 0) {
+                free(dir[n]);
+                continue;
             }
-            free(namelist);
+
+            if (dir[n]->d_type == DT_REG || dir[n]->d_type == DT_DIR || dir[n]->d_type == DT_LNK) {
+                char fullPath[PATH_MAX];
+                snprintf(fullPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
+
+                if (strstr(fullPath, input) != NULL) {
+                    char *result = malloc(strlen(fullPath) + 1);
+                    strcpy(result, fullPath);
+                    results[(*num_results)++] = result;
+                }
+            }
+
+            if (dir[n]->d_type == DT_DIR) {
+                char newPath[PATH_MAX];
+                snprintf(newPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
+                printDirectory(newPath, input, results, num_results);
+            }
+
+            free(dir[n]);
         }
+
+        free(dir);
+    }
+}
+
+void search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *path, const char *results[]) {
+    int num_results = 0;
+    printDirectory(path, input, results, &num_results);
 
     qsort(results, num_results, sizeof(const char *), compare_filenames);
 
@@ -33,11 +58,11 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
     char input[MAX_LENGTH];
     int input_length = 0;
     int selected_index = 0;
-    const char *results[MAX_LENGTH];
+    char *results[MAX_LENGTH];
     int num_results = 0;
     char path[MAX_LENGTH] = ".";
 
-    search_directory(search_win, results_win, input, path,results);
+    search_directory(search_win, results_win, input, path, results);
 
     while (true) {
         int ch = wgetch(search_win);
@@ -69,7 +94,6 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
                 break;
         }
 
-    search_directory(search_win, results_win, input, path, results);
-
+        search_directory(search_win, results_win, input, path, results);
     }
 }
