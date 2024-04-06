@@ -5,13 +5,9 @@ int compare_filenames(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
-int compare(const struct dirent **a, const struct dirent **b) {
-    return strcmp((*a)->d_name, (*b)->d_name);
-}
-
 void printDirectory(const char *path, const char *input, char *results[], int *num_results) {
     struct dirent **dir;
-    int n = scandir(path, &dir, NULL, compare);
+    int n = scandir(path, &dir, NULL, NULL);
 
     if (n != -1) {
         while (n--) {
@@ -57,7 +53,7 @@ int search_directory(WINDOW *search_win, WINDOW *results_win, const char *input,
 }
 
 void handle_input(WINDOW *search_win, WINDOW *results_win) {
-    char input[MAX_LENGTH];
+    char input[MAX_LENGTH] = "";
     int input_length = 0;
     int selected_index = 0;
     char *results[MAX_LENGTH];
@@ -79,30 +75,32 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
                     }
                     input_length--;
                     cursor_position--;
+                    if(cursor_position == -1) cursor_position = 0;
                     input[input_length] = '\0';
                 }
-                break;
+            break;
             case KEY_DOWN:
                 if (selected_index < num_results - 1) {
                 selected_index++;
                 render_results_window(results_win, results, num_results, selected_index);
                 }
-                break;
+            break;
             case KEY_UP:
                 if (selected_index > 0) {
                 selected_index--;
                 render_results_window(results_win, results, num_results, selected_index);
                 }
-                break;
+            break;
             case KEY_LEFT:
                 if (cursor_position > 0) {
                     cursor_position--;
                 }
-                break;
+            break;
             case KEY_RIGHT:
                 if (cursor_position < input_length) {
                     cursor_position++;
                 }
+            break;
             default:
                 if (ch >= 32 && ch <= 126 && input_length < MAX_LENGTH - 1) {
                     for (int i = input_length; i > cursor_position; i--) {
@@ -113,11 +111,11 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
                     input[input_length] = '\0';
                     render_search_window(search_win, input, cursor_position);
                 }
-                break;
+            break;
 
         render_search_window(search_win, input, cursor_position);
         }
-            num_results = search_directory(search_win, results_win, input, path, results, selected_index, cursor_position);
+        num_results = search_directory(search_win, results_win, input, path, results, selected_index, cursor_position);
 
     }
 }

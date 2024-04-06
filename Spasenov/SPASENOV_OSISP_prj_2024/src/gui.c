@@ -15,9 +15,10 @@ void render_search_window(WINDOW *search_win, const char *search_query, int curs
 
     if (cursor_position == strlen(search_query)) {
         wattron(search_win, A_STANDOUT);  // Включение режима обратного видимости
-        mvwprintw(search_win, 0, strlen(search_query) + 1, " ");  // Вывод пробела после строки поиска
+        mvwprintw(search_win, 1, strlen(search_query) + 1, " ");  // Вывод пробела после строки поиска
         wattroff(search_win, A_STANDOUT);  // Отключение режима обратного видимости
     }
+
     wmove(search_win, 1, 1 + cursor_position);
     wrefresh(search_win);
 }
