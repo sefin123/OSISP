@@ -14,7 +14,7 @@ char** getShortVariables(const char* fname) {
         char **result = (char **)calloc(VAR_NUM, sizeof(char *));
         for (int i = 0; i < VAR_NUM; i++) {
             result[i] = (char*)calloc(80, sizeof(char));             
-            fgets(result[i], 80, f);                                        // Чтение всех строк.
+            fgets(result[i], 80, f);
             result[i][strlen(result[i])-1] = '\0';
         }
         fclose(f);
@@ -45,19 +45,19 @@ int main(int argc, char* argv[], char* envp[]) {
 
     printf("Process name: %s\nProcess pid: %d\nProcess ppdid: %d\n", argv[0], (int) getpid(), (int) getppid());
 
-    char **variables = getShortVariables(argv[1]);                             // Получаем список необходимых переменных среды из файла.
+    char **variables = getShortVariables(argv[1]);
     if (variables != NULL) {
         switch (argv[2][0]) {
             case '+':
-                for (int i = 0; i < VAR_NUM; i++)                              // Получаем переменную среды системной функцией.
+                for (int i = 0; i < VAR_NUM; i++)
                     printf("%s=%s\n", variables[i], getenv(variables[i]));
                 break;
             case '*':
-                for (int i = 0; i < VAR_NUM; i++)                              // Получаем переменную среды из аргументов.
+                for (int i = 0; i < VAR_NUM; i++)
                     printf("%s\n", findEnvpVariable(envp, variables[i]));
                 break;
             case '&':
-                for (int i = 0; i < VAR_NUM; i++)                              // Получаем переменную среды из внешней переменной.
+                for (int i = 0; i < VAR_NUM; i++)
                     printf("%s\n", findEnvpVariable(environ, variables[i]));
                 break;
         }

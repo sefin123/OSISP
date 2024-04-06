@@ -1,19 +1,17 @@
+#include "gui.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <ncurses.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-#define BUFFER_SIZE 1024
-#define HISTORY_FILE "history.txt"
+#define MAX_LENGTH 256
 
+#define DT_DIR 4
 
-#pragma GCC visibility push(default)
-extern FILE* popen(const char* command, const char* mode) __attribute__((visibility("default")));
-#pragma GCC visibility pop
+void handle_input(WINDOW *search_win, WINDOW *results_win);
 
-#pragma GCC visibility push(default)
-extern int pclose(FILE* stream) __attribute__((visibility("default")));
-#pragma GCC visibility pop
-
-void run_command(const char* command, char* buffer, size_t buffer_size);
+void search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *search_dir, const char *results[]) {

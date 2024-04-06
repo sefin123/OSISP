@@ -35,13 +35,21 @@ int compare(const void *a, const void *b) {
     return strcoll(*(const char **)a, *(const char **)b);
 }
 
+void incName(char** name) {
+    if ((*name)[7] == '9') {
+        (*name)[6]++;
+        (*name)[7] = 0;
+    } else
+        (*name)[7]++;
+}
+
 int main(int argc, char* argv[], char* envp[]) {
 
-    setlocale(LC_COLLATE, "C");                                                      // Установить локаль.
+    setlocale(LC_COLLATE, "C");
 
     int i = 0;
-    while (envp[i++]);                                                               // Узнать число параметров среды.
-    qsort(envp, i-1, sizeof(char*), compare);                                        // Сортировка.
+    while (envp[i++]);                                                               
+    qsort(envp, i-1, sizeof(char*), compare);                                       
     i = 0;
     while(envp[i]) {
         printf("%s\n", envp[i++]);
@@ -57,10 +65,10 @@ int main(int argc, char* argv[], char* envp[]) {
         if (key == 'q')
             break;
         else if (key == '+' || key == '*' || key == '&') {
-            pid_t chpid = fork();                                                    // Новый процесс.
+            pid_t chpid = fork();                                                    
             if (chpid == 0) {   
                 char *childDir = NULL;
-                switch (key) {                                                       // Получаем путь к программе сhild в соответствии с нажатой клавишей.
+                switch (key) {                                                       
                     case '+':
                         childDir = getenv("CHILD_PATH");
                         break;
@@ -73,19 +81,21 @@ int main(int argc, char* argv[], char* envp[]) {
                 }
                 if (childDir) {
                     char *newArgv[] = {childName, argv[1], &key, NULL};
-                    execve(childDir, newArgv, envp);                                // Вызов программы.
+                    execve(childDir, newArgv, envp);                                
                 } else {
                     printf("Error occured, path not find.\n");
                 }
             } else if (chpid == -1) {
                 printf("Error occured, error code - %d\n", errno);
                 exit(errno);
+            } else {
+                incName(&childName);
             }
         } else
             printf("Unknown key. Press '+', '*', '&' or q.\n");
-        waitpid(-1, NULL, WNOHANG);                                                 // Ожидание завершения процесса.
+        waitpid(-1, NULL, WNOHANG);                                                 
     }
-
+    
     free(childName);
 
     return 0;
