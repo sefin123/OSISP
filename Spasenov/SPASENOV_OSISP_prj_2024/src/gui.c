@@ -14,13 +14,40 @@ void render_search_window(WINDOW *search_win, const char *search_query, int curs
     }
 
     if (cursor_position == strlen(search_query)) {
-        wattron(search_win, A_STANDOUT);  // Включение режима обратного видимости
-        mvwprintw(search_win, 1, strlen(search_query) + 1, " ");  // Вывод пробела после строки поиска
-        wattroff(search_win, A_STANDOUT);  // Отключение режима обратного видимости
+        wattron(search_win, A_STANDOUT);
+        mvwprintw(search_win, 1, strlen(search_query) + 1, " ");
+        wattroff(search_win, A_STANDOUT);
     }
 
     wmove(search_win, 1, 1 + cursor_position);
     wrefresh(search_win);
+}
+
+void render_info_window(WINDOW **info_win) {
+    int rows, cols;
+    getmaxyx(stdscr, rows, cols);  // Получение размеров терминала
+    int info_win_height = rows - 2;  // Высота окна информации
+    int info_win_width = cols - 2;  // Ширина окна информации
+    int info_win_y = 1;  // Положение окна информации по вертикали
+    int info_win_x = 1;  // Положение окна информации по горизонтали
+
+    // Создание информационного окна
+    *info_win = newwin(info_win_height, info_win_width, info_win_y, info_win_x);
+    box(*info_win, 0, 0);  // Отрисовка рамки вокруг окна информации
+
+    // Очистка и обновление информационного окна
+    wclear(*info_win);  // Очистка окна информации
+    box(*info_win, 0, 0);  // Отрисовка рамки вокруг окна информации
+
+    int text_length = strlen(ABOUT_PROGRAMM);
+    int position_x = (info_win_width - text_length) / 2;
+    int position_y = info_win_height / 2;
+
+    mvwprintw(*info_win, position_y, position_x, ABOUT_PROGRAMM);  // Вывод информации
+    wrefresh(*info_win);  // Обновление окна информации
+
+    // Пометка информационного окна для обновления
+    touchwin(stdscr);
 }
 
 void render_results_window(WINDOW *win, const char *results[], int num_results, int selected_index) {
@@ -35,9 +62,12 @@ void render_results_window(WINDOW *win, const char *results[], int num_results, 
             wattroff(win, A_STANDOUT);
         }
     }
+    int terminal_width = getmaxx(stdscr);  // Получаем ширину терминала
+    int x = (terminal_width - strlen(NAVIGATION)) / 2; 
+    mvprintw(LINES - 1, x, NAVIGATION);
+    refresh();
     wrefresh(win);
 }
-
 
 mainWindow* render_main_window() {
     mainWindow *window = malloc(sizeof(mainWindow));

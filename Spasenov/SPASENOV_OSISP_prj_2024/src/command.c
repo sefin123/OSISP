@@ -1,4 +1,3 @@
-#include <dirent.h>
 #include "command.h"
 
 int compare_filenames(const void *a, const void *b) {
@@ -60,10 +59,12 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
     int num_results = 0;
     char path[MAX_LENGTH] = ".";
     int cursor_position = 0;
+    int current_window = 1;
 
     num_results = search_directory(search_win, results_win, input, path, results, 0, cursor_position);
 
     while (true) {
+
         int ch = wgetch(search_win);
         switch (ch) {
             case 27:  // Escape key
@@ -76,19 +77,21 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
                     input_length--;
                     cursor_position--;
                     if(cursor_position == -1) cursor_position = 0;
+                    if(selected_index > num_results) selected_index = num_results;
                     input[input_length] = '\0';
                 }
             break;
             case KEY_DOWN:
                 if (selected_index < num_results - 1) {
-                selected_index++;
-                render_results_window(results_win, results, num_results, selected_index);
+                    selected_index++;
+                    render_results_window(results_win, results, num_results, selected_index);
                 }
             break;
             case KEY_UP:
                 if (selected_index > 0) {
-                selected_index--;
-                render_results_window(results_win, results, num_results, selected_index);
+                    if (selected_index > num_results) selected_index = num_results;
+                    selected_index--;
+                    render_results_window(results_win, results, num_results, selected_index);
                 }
             break;
             case KEY_LEFT:
@@ -101,6 +104,26 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
                     cursor_position++;
                 }
             break;
+            case KEY_F(3):
+                WINDOW *info_win;
+                render_info_window(&info_win);
+
+                keypad(info_win, TRUE);  // Включение режима обработки специальных клавиш
+                wtimeout(info_win, 0);  // Установка нулевого времени ожидания
+
+                int ch2;
+                bool exit_info = false;  // Флаг для выхода из цикла
+                while (!exit_info) {
+                    ch2 = wgetch(info_win);
+                    if (ch2 == KEY_F(1)) {
+                        exit_info = true;  // Установка флага для выхода из цикла
+                        break;
+                    }
+                }
+                render_results_window(results_win, results, num_results, selected_index);
+                render_search_window(search_win, input, cursor_position);
+                delwin(info_win);  // Освобождение памяти информационного окна
+            break;      
             default:
                 if (ch >= 32 && ch <= 126 && input_length < MAX_LENGTH - 1) {
                     for (int i = input_length; i > cursor_position; i--) {
@@ -109,13 +132,11 @@ void handle_input(WINDOW *search_win, WINDOW *results_win) {
                     input[cursor_position++] = ch;
                     input_length++;
                     input[input_length] = '\0';
-                    render_search_window(search_win, input, cursor_position);
                 }
             break;
-
+        render_results_window(results_win, results, num_results, selected_index);
         render_search_window(search_win, input, cursor_position);
         }
         num_results = search_directory(search_win, results_win, input, path, results, selected_index, cursor_position);
-
     }
 }
