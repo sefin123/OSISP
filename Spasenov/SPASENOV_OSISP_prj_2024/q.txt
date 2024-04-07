@@ -1,0 +1,38 @@
+FILE *historyFile = fopen("History.txt", "r+");
+    
+    char** historyStr = malloc(MAX_LENGTH * sizeof(char*));
+    if (historyStr == NULL) {
+        perror("Memory allocation failed.");
+        return NULL;
+    }
+
+    char str[MAX_LENGTH];
+    int lineNumber = 2;
+    int i = 0;
+    while (fgets(str, MAX_LENGTH, historyFile) != NULL) {
+        if (str[strlen(str) - 1] == '\n') {
+            str[strlen(str) - 1] = '\0';
+        }
+        if (strcmp(input, str) != 0) {
+            strcpy(historyStr[i], str);
+            for (int j = 0; j < (int)strlen(str); j++) {
+                if (j == selectedIndex) {
+                    wattron(*win, A_STANDOUT);
+                }
+                mvwprintw(*win, lineNumber, 1 + j, "%c", str[j]);
+                if (j == selectedIndex) {
+                    wattroff(*win, A_STANDOUT);
+                }
+            }
+            lineNumber++;
+            i++;
+        }
+    }
+
+    while (i != 0) {
+        fprintf(historyFile, "%s\n", historyStr[i - 1]);
+        i--;
+    }
+
+    fclose(historyFile);
+    

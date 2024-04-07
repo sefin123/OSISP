@@ -2,16 +2,15 @@
 
 void parametrsHandler() {
 
-    WINDOW* parametrsWin = newwin(0, 0, 0, 0);
-    renderParametrsWindow(&parametrsWin);
-    
+    WINDOW* win;
+    renderParametrsWindow(&win);
     
     while (true) {
-        int ch = wgetch(parametrsWin);
+        int ch = wgetch(win);
         if (ch == KEY_F(4)) {
             return;
         }
     }
-    delwin(parametrsWin);
+    delwin(win);
     endwin();
 }

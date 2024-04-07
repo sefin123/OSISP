@@ -1,3 +1,5 @@
 #include "gui.h"
 
+#define ABOUT_PROGRAMM "NCURSES-BASED SHELL FOR FIND UTILITY WITH HISTORY STORAGE AND EDITING"
+
 void aboutHandler();

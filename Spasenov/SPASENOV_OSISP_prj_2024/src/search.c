@@ -12,7 +12,7 @@ int compareFilenames(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
-void printDirectory(const char *path, const char *input, const char *results[], int *numResults) {
+void saveDirectory(const char *path, const char *input, const char *results[], int *numResults) {
     struct dirent **dir;
     int n = scandir(path, &dir, NULL, NULL);
 
@@ -37,7 +37,7 @@ void printDirectory(const char *path, const char *input, const char *results[], 
             if (dir[n]->d_type == DT_DIR) {
                 char newPath[PATH_MAX];
                 snprintf(newPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
-                printDirectory(newPath, input, results, numResults);
+                saveDirectory(newPath, input, results, numResults);
             }
 
             free(dir[n]);
@@ -47,9 +47,9 @@ void printDirectory(const char *path, const char *input, const char *results[], 
     }
 }
 
-int searchDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition) {
+int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition) {
     int numResults = 0;
-    printDirectory(path, input, results, &numResults);
+    saveDirectory(path, input, results, &numResults);
 
     qsort(results, numResults, sizeof(const char *), compareFilenames);
 
@@ -63,7 +63,7 @@ void writePath(const char* path) {
 
     FILE *file = fopen("History.txt", "a");
     if (file == NULL) {
-        perror("Не удалось открыть файл");
+        perror("Cant open file");
         return;
     }
 
@@ -80,6 +80,14 @@ void keyDownHandler(WINDOW* win) {
     }
 }
 
+void keyUpHandler(WINDOW* win) {
+    if (selectedIndex > 0) {
+        if (selectedIndex > numResults) selectedIndex = numResults;
+        selectedIndex--;
+        renderResultsWindow(win, results, numResults, selectedIndex);
+    }
+}
+
 void keyBackspaseHandler() {
     if (inputLength > 0) {
         for (int i = cursorPosition; i < inputLength; i++) {
@@ -90,14 +98,6 @@ void keyBackspaseHandler() {
         if(cursorPosition == -1) cursorPosition = 0;
         if(selectedIndex > numResults) selectedIndex = numResults;
         input[inputLength] = '\0';
-    }
-}
-
-void keyUpHandler(WINDOW* resultsWin) {
-    if (selectedIndex > 0) {
-        if (selectedIndex > numResults) selectedIndex = numResults;
-        selectedIndex--;
-        renderResultsWindow(resultsWin, results, numResults, selectedIndex);
     }
 }
 
@@ -116,11 +116,11 @@ void keyLeftHandler() {
 void keyEnterHandler() {
     writePath(results[selectedIndex]);
     strcpy(input, results[selectedIndex]);
-    cursorPosition = 0;
     inputLength = (int)strlen(results[selectedIndex]);
+    cursorPosition = inputLength;
 }
 
-void keyF3Handler(WINDOW* resultsWin, WINDOW* searchWin) {
+void keyF3Handler() {
     aboutHandler();
 }
 
@@ -145,7 +145,7 @@ void writeHandler(int ch) {
 
 void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
 
-    numResults = searchDirectory(searchWin, resultsWin, input, path, results, 0, cursorPosition);
+    numResults = printDirectory(searchWin, resultsWin, input, path, results, 0, cursorPosition);
 
     while (true) {
 
@@ -178,7 +178,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             break;
             }
             case KEY_F(3): {
-                keyF3Handler(resultsWin, searchWin);
+                keyF3Handler();
                 renderResultsWindow(resultsWin, results, numResults, selectedIndex);
                 renderSearchWindow(searchWin, input, cursorPosition);
                 break;   
@@ -189,15 +189,17 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             }
             case KEY_F(1): {
                 keyF1Handler();
+                renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+                renderSearchWindow(searchWin, input, cursorPosition);
                 break;
             }
             default: {
                 writeHandler(ch);
             break;
             }
-            renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-            renderSearchWindow(searchWin, input, cursorPosition);
         }
-        numResults = searchDirectory(searchWin, resultsWin, input, path, results, selectedIndex, cursorPosition);
+        renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+        renderSearchWindow(searchWin, input, cursorPosition);
+        numResults = printDirectory(searchWin, resultsWin, input, path, results, selectedIndex, cursorPosition);
     }
 }

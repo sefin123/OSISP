@@ -12,8 +12,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#define MAX_LENGTH 256
+
 #define search_win_height 3
 #define results_win_height (LINES - search_win_height - 2)
+
 #define ABOUT_PROGRAMM "NCURSES-BASED SHELL FOR FIND UTILITY WITH HISTORY STORAGE AND EDITING"
 #define NAVIGATION "F1: Parametrs    F2: History    F3: About    F4: Back/Exit"
 
@@ -28,8 +31,10 @@ void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int
 
 mainWindow* renderMainWindow();
 
-void renderInfoWindow(WINDOW **win);
+void renderAboutWindow(WINDOW **win);
 
 void renderParametrsWindow(WINDOW** win);
+
+void renderHistoryWindow(WINDOW** win);
 
 #endif

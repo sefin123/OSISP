@@ -1,15 +1,7 @@
 #include "parametrs.h"
 #include "about.h"
 #include "history.h"
-#include <stdio.h>
-#include <string.h>
-#include <ncurses.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
-#define MAX_LENGTH 256
 #define PATH_MAX 257
 
 enum {  
@@ -40,6 +32,32 @@ extern int scandir (const char *__restrict __dir,
 				  const struct dirent **))
      __nonnull ((1, 2));
 
-void handleInput(WINDOW *searchWin, WINDOW *resultsWin);
+int compareFilenames(const void *a, const void *b);
 
-int searchDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition);
+void saveDirectory(const char *path, const char *input, const char *results[], int *numResults);
+
+int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition);
+
+void writePath(const char* path);
+
+void keyDownHandler(WINDOW* win);
+
+void keyBackspaseHandler();
+
+void keyUpHandler(WINDOW* win);
+
+void keyRightHandler();
+
+void keyLeftHandler();
+
+void keyEnterHandler();
+
+void keyF3Handler();
+
+void keyF2Handler();
+
+void keyF1Handler();
+
+void writeHandler(int ch);
+
+void handleInput(WINDOW *searchWin, WINDOW *resultsWin);

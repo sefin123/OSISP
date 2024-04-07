@@ -29,33 +29,43 @@ void renderParametrsWindow(WINDOW** win) {
 
     *win = newwin(windowHeight - 1, windowWidth, 0, 0);
     box(*win, 0, 0);
-    refresh();
-    wrefresh(*win);
     keypad(*win, TRUE);
+    wclear(*win);
+    box(*win, 0, 0);
+    
     mvwprintw(*win, 1, 2, "Parametrs for utility find: ");
-    int terminalWidth = getmaxx(stdscr);
-    int x = (terminalWidth - strlen(NAVIGATION)) / 2; 
-    mvprintw(LINES - 1, x, NAVIGATION);
-    refresh();
-    wrefresh(*win);
+    
+    touchwin(stdscr);
 }
 
-void renderInfoWindow(WINDOW **win) {
-    int rows, cols;
-    getmaxyx(stdscr, rows, cols);
-    int infoWinHeight = rows - 2;
-    int infoWinWidth = cols - 2;
-    int infoWinY = 1;
-    int infoWinX = 1;
-
-    *win = newwin(infoWinHeight, infoWinWidth, infoWinY, infoWinX);
+void renderHistoryWindow(WINDOW** win) {
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
+    *win = newwin(windowHeight - 1, windowWidth, 0, 0);
     box(*win, 0, 0);
+    keypad(*win, TRUE);
+    wclear(*win);
+    box(*win, 0, 0);
+
+    mvwprintw(*win, 1, 1, "History:");
+
+    touchwin(stdscr);
+
+}
+
+void renderAboutWindow(WINDOW **win) {
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
+
+    *win = newwin(windowHeight - 1, windowWidth, 0, 0);
+    box(*win, 0, 0);
+    keypad(*win, TRUE);
     wclear(*win);
     box(*win, 0, 0);
 
     int textLength = strlen(ABOUT_PROGRAMM);
-    int positionX = (infoWinWidth - textLength) / 2;
-    int positionY = infoWinHeight / 2;
+    int positionX = (windowWidth - textLength) / 2;
+    int positionY = windowHeight / 2;
 
     mvwprintw(*win, positionY, positionX, ABOUT_PROGRAMM);
     wrefresh(*win);
