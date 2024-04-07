@@ -125,7 +125,9 @@ void keyF3Handler() {
 }
 
 void keyF2Handler() {
-    historyHandler();
+    strcpy(input, historyHandler());
+    cursorPosition = (int)strlen(input);
+    inputLength = cursorPosition;
 }
 
 void keyF1Handler() {

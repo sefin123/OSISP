@@ -18,9 +18,9 @@ void keyDownHistoryHandler() {
     }
 }
 
-void printHistory(WINDOW* win, char *result[], int *numHistoryResults) {
+int printHistory(WINDOW* win, char *result[]) {
     FILE* historyFile = fopen("History.txt", "r+");
-
+    int numHistoryResults = 0;
     char str[MAX_LENGTH];
     int i = 0;
     while (fgets(str, MAX_LENGTH, historyFile) != NULL) {
@@ -29,62 +29,77 @@ void printHistory(WINDOW* win, char *result[], int *numHistoryResults) {
         }
         char *res = malloc(strlen(str) + 1);
         strcpy(res, str);
-        result[(*numHistoryResults)++] = res;
-        mvwprintw(win, i + 3, 1, "%s", result[i]);
+        result[numHistoryResults++] = res;
+        mvwprintw(win, 20, 1, "selected: %d", selectedHistoryIndex);
+        mvwprintw(win, 21, 1, "num: %d", numHistoryResults);
+
+        if(i == selectedHistoryIndex) {
+            wattron(win, A_STANDOUT);
+            mvwprintw(win, i + 3, 1, "%s", result[i]);
+            wattroff(win, A_STANDOUT);
+        } else {
+            mvwprintw(win, i + 3, 1, "%s", result[i]);
+        }
+
         i++;
     }
+    
     fclose(historyFile);
+    return numHistoryResults;
 }
 
-void switchWord(WINDOW* win, char *result[]) {
-    werase(win);
-    box(win, 0, 0);
-    for (int i = 0; i < numHistoryResults; i++) {
-        if (i == selectedHistoryIndex) {
-            wattron(win, A_STANDOUT);
-        }
-        //mvwprintw(win, i + 1, 1, "%s", result[i]);
-        if (i == selectedHistoryIndex) {
-            wattroff(win, A_STANDOUT);
+char* keyEnterHistoryHandler() {
+    return result[selectedHistoryIndex];
+}
+
+void deletePathFromHistory() {
+    FILE* file = fopen("History.txt" ,"w");
+
+    numHistoryResults--;
+    if (selectedHistoryIndex < numHistoryResults) {
+        for (int i = selectedHistoryIndex; i < numHistoryResults; i++) {
+            result[i] = result[i + 1];
         }
     }
-    int terminalWidth = getmaxx(stdscr);
-    int x = (terminalWidth - strlen(NAVIGATION)) / 2; 
-    mvprintw(LINES - 1, x, NAVIGATION);
-    refresh();
-    wrefresh(win);
+
+    for (int i = 0; i < numHistoryResults; i++) {
+            fprintf(file, "%s\n", result[i]);
+    }
+    
+    fclose(file);
+    
 }
 
-void historyHandler() {
+void keyBackspaseHistoryHandler() {
+    deletePathFromHistory();
+}
 
+char* historyHandler() {
 
     WINDOW* win;
     renderHistoryWindow(&win);
-    printHistory(win, result, &numHistoryResults);
+
+    numHistoryResults = printHistory(win, result);
     while (true) {
         int ch = wgetch(win);
         
             if (ch ==KEY_F(4)) {
-            return;
+            return "";
             }
             if (ch == KEY_UP) {
                 keyUpHistoryHandler();
-    printHistory(win, result, &numHistoryResults);
-                switchWord(win, result);
-                break;
             }
             if (ch == KEY_DOWN) {
                 keyDownHistoryHandler();
-    printHistory(win, result, &numHistoryResults);
-                switchWord(win, result);
-                break;
             }
             if (ch == 10) { //Enter
-                return;
+                return keyEnterHistoryHandler();
             }
             if (ch == KEY_BACKSPACE) {
-                return;
+                keyBackspaseHistoryHandler();
             }
+        renderHistoryWindow(&win);
+        numHistoryResults = printHistory(win, result);
     }
     delwin(win);
     endwin();
