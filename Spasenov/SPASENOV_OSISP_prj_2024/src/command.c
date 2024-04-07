@@ -7,7 +7,6 @@ const char *results[MAX_LENGTH];
 int numResults = 0;
 char path[MAX_LENGTH] = ".";
 int cursorPosition = 0;
-int currentWindow = 1;
 
 int compareFilenames(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
@@ -60,6 +59,20 @@ int searchDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, co
     return numResults;
 }
 
+void writePath(const char* path) {
+
+    FILE *file = fopen("History.txt", "a");
+    if (file == NULL) {
+        perror("Не удалось открыть файл");
+        return;
+    }
+
+    fprintf(file, "%s\n", path);
+
+    fclose(file);
+    refresh();
+}
+
 void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
 
     numResults = searchDirectory(searchWin, resultsWin, input, path, results, 0, cursorPosition);
@@ -70,7 +83,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
         switch (ch) {
             case 27:  // Escape key
                 return;
-            case KEY_BACKSPACE:
+            case KEY_BACKSPACE: {
                 if (inputLength > 0) {
                     for (int i = cursorPosition; i < inputLength; i++) {
                         input[i - 1] = input[i];
@@ -82,29 +95,41 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
                     input[inputLength] = '\0';
                 }
             break;
-            case KEY_DOWN:
+            }
+            case KEY_DOWN: {
                 if (selectedIndex < numResults - 1) {
                     selectedIndex++;
                     renderResultsWindow(resultsWin, results, numResults, selectedIndex);
                 }
             break;
-            case KEY_UP:
+            }
+            case KEY_UP: {
                 if (selectedIndex > 0) {
                     if (selectedIndex > numResults) selectedIndex = numResults;
                     selectedIndex--;
                     renderResultsWindow(resultsWin, results, numResults, selectedIndex);
                 }
             break;
-            case KEY_LEFT:
+            }
+            case KEY_LEFT: {
                 if (cursorPosition > 0) {
                     cursorPosition--;
                 }
             break;
-            case KEY_RIGHT:
+            }
+            case KEY_RIGHT: {
                 if (cursorPosition < inputLength) {
                     cursorPosition++;
                 }
             break;
+            }
+            case 10: { //Enter key
+                writePath(results[selectedIndex]);
+                strcpy(input, results[selectedIndex]);
+                cursorPosition = 0;
+                inputLength = (int)strlen(results[selectedIndex]);
+                break;
+            }
             case KEY_F(3): {
                 WINDOW *infoWin;
                 renderInfoWindow(&infoWin);
@@ -121,9 +146,9 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
                 renderResultsWindow(resultsWin, results, numResults, selectedIndex);
                 renderSearchWindow(searchWin, input, cursorPosition);
                 delwin(infoWin);
+                break;   
             }
-            break;   
-            default:
+            default: {
                 if (ch >= 32 && ch <= 126 && inputLength < MAX_LENGTH - 1) {
                     for (int i = inputLength; i > cursorPosition; i--) {
                         input[i] = input[i - 1];
@@ -133,6 +158,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
                     input[inputLength] = '\0';
                 }
             break;
+            }
         renderResultsWindow(resultsWin, results, numResults, selectedIndex);
         renderSearchWindow(searchWin, input, cursorPosition);
         }
