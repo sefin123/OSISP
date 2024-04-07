@@ -1,10 +1,19 @@
 #include "command.h"
 
-int compare_filenames(const void *a, const void *b) {
+char input[MAX_LENGTH] = "";
+int inputLength = 0;
+int selectedIndex = 0;
+const char *results[MAX_LENGTH];
+int numResults = 0;
+char path[MAX_LENGTH] = ".";
+int cursorPosition = 0;
+int currentWindow = 1;
+
+int compareFilenames(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
-void printDirectory(const char *path, const char *input, char *results[], int *num_results) {
+void printDirectory(const char *path, const char *input, const char *results[], int *numResults) {
     struct dirent **dir;
     int n = scandir(path, &dir, NULL, NULL);
 
@@ -22,14 +31,14 @@ void printDirectory(const char *path, const char *input, char *results[], int *n
                 if (strstr(fullPath, input) != NULL) {
                     char *result = malloc(strlen(fullPath) + 1);
                     strcpy(result, fullPath);
-                    results[(*num_results)++] = result;
+                    results[(*numResults)++] = result;
                 }
             }
 
             if (dir[n]->d_type == DT_DIR) {
                 char newPath[PATH_MAX];
                 snprintf(newPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
-                printDirectory(newPath, input, results, num_results);
+                printDirectory(newPath, input, results, numResults);
             }
 
             free(dir[n]);
@@ -39,104 +48,94 @@ void printDirectory(const char *path, const char *input, char *results[], int *n
     }
 }
 
-int search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *path, const char *results[], int selected_index, int cousor_position) {
-    int num_results = 0;
-    printDirectory(path, input, results, &num_results);
+int searchDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition) {
+    int numResults = 0;
+    printDirectory(path, input, results, &numResults);
 
-    qsort(results, num_results, sizeof(const char *), compare_filenames);
+    qsort(results, numResults, sizeof(const char *), compareFilenames);
 
-    render_search_window(search_win, input, cousor_position);
-    render_results_window(results_win, results, num_results, selected_index);
+    renderSearchWindow(searchWin, input, cousorPosition);
+    renderResultsWindow(resultsWin, results, numResults, selectedIndex);
     
-    return num_results;
+    return numResults;
 }
 
-void handle_input(WINDOW *search_win, WINDOW *results_win) {
-    char input[MAX_LENGTH] = "";
-    int input_length = 0;
-    int selected_index = 0;
-    char *results[MAX_LENGTH];
-    int num_results = 0;
-    char path[MAX_LENGTH] = ".";
-    int cursor_position = 0;
-    int current_window = 1;
+void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
 
-    num_results = search_directory(search_win, results_win, input, path, results, 0, cursor_position);
+    numResults = searchDirectory(searchWin, resultsWin, input, path, results, 0, cursorPosition);
 
     while (true) {
 
-        int ch = wgetch(search_win);
+        int ch = wgetch(searchWin);
         switch (ch) {
             case 27:  // Escape key
                 return;
             case KEY_BACKSPACE:
-                if (input_length > 0) {
-                    for (int i = cursor_position; i < input_length; i++) {
+                if (inputLength > 0) {
+                    for (int i = cursorPosition; i < inputLength; i++) {
                         input[i - 1] = input[i];
                     }
-                    input_length--;
-                    cursor_position--;
-                    if(cursor_position == -1) cursor_position = 0;
-                    if(selected_index > num_results) selected_index = num_results;
-                    input[input_length] = '\0';
+                    inputLength--;
+                    cursorPosition--;
+                    if(cursorPosition == -1) cursorPosition = 0;
+                    if(selectedIndex > numResults) selectedIndex = numResults;
+                    input[inputLength] = '\0';
                 }
             break;
             case KEY_DOWN:
-                if (selected_index < num_results - 1) {
-                    selected_index++;
-                    render_results_window(results_win, results, num_results, selected_index);
+                if (selectedIndex < numResults - 1) {
+                    selectedIndex++;
+                    renderResultsWindow(resultsWin, results, numResults, selectedIndex);
                 }
             break;
             case KEY_UP:
-                if (selected_index > 0) {
-                    if (selected_index > num_results) selected_index = num_results;
-                    selected_index--;
-                    render_results_window(results_win, results, num_results, selected_index);
+                if (selectedIndex > 0) {
+                    if (selectedIndex > numResults) selectedIndex = numResults;
+                    selectedIndex--;
+                    renderResultsWindow(resultsWin, results, numResults, selectedIndex);
                 }
             break;
             case KEY_LEFT:
-                if (cursor_position > 0) {
-                    cursor_position--;
+                if (cursorPosition > 0) {
+                    cursorPosition--;
                 }
             break;
             case KEY_RIGHT:
-                if (cursor_position < input_length) {
-                    cursor_position++;
+                if (cursorPosition < inputLength) {
+                    cursorPosition++;
                 }
             break;
-            case KEY_F(3):
-                WINDOW *info_win;
-                render_info_window(&info_win);
+            case KEY_F(3): {
+                WINDOW *infoWin;
+                renderInfoWindow(&infoWin);
 
-                keypad(info_win, TRUE);  // Включение режима обработки специальных клавиш
-                wtimeout(info_win, 0);  // Установка нулевого времени ожидания
+                keypad(infoWin, TRUE);
 
-                int ch2;
-                bool exit_info = false;  // Флаг для выхода из цикла
-                while (!exit_info) {
-                    ch2 = wgetch(info_win);
-                    if (ch2 == KEY_F(1)) {
-                        exit_info = true;  // Установка флага для выхода из цикла
-                        break;
+                int simbol;
+                while (true) {
+                    simbol = wgetch(infoWin);
+                    if (simbol == KEY_F(1)) {
+                    break;
                     }
                 }
-                render_results_window(results_win, results, num_results, selected_index);
-                render_search_window(search_win, input, cursor_position);
-                delwin(info_win);  // Освобождение памяти информационного окна
-            break;      
+                renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+                renderSearchWindow(searchWin, input, cursorPosition);
+                delwin(infoWin);
+            }
+            break;   
             default:
-                if (ch >= 32 && ch <= 126 && input_length < MAX_LENGTH - 1) {
-                    for (int i = input_length; i > cursor_position; i--) {
+                if (ch >= 32 && ch <= 126 && inputLength < MAX_LENGTH - 1) {
+                    for (int i = inputLength; i > cursorPosition; i--) {
                         input[i] = input[i - 1];
                     }
-                    input[cursor_position++] = ch;
-                    input_length++;
-                    input[input_length] = '\0';
+                    input[cursorPosition++] = ch;
+                    inputLength++;
+                    input[inputLength] = '\0';
                 }
             break;
-        render_results_window(results_win, results, num_results, selected_index);
-        render_search_window(search_win, input, cursor_position);
+        renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+        renderSearchWindow(searchWin, input, cursorPosition);
         }
-        num_results = search_directory(search_win, results_win, input, path, results, selected_index, cursor_position);
+        numResults = searchDirectory(searchWin, resultsWin, input, path, results, selectedIndex, cursorPosition);
     }
 }

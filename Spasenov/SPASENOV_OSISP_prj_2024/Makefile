@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -ggdb -std=c11 -pedantic -W -Wall -Wextra
+CFLAGS=-g -ggdb -std=c99 -pedantic -W -Wall -Wextra
 SRC=src
 BUILD=build
 BIN=bin
@@ -9,7 +9,7 @@ OUT_DIR=$(BIN)/debug
 BUILD_DIST=$(DEBUG_DIST)
 
 ifeq ($(MODE), release)
-	CFLAGS=-std=c11 -pedantic -W -Wall -Wextra -Werror
+	CFLAGS=-std=c99 -pedantic -W -Wall -Wextra -Werror
 	OUT_DIR=$(BIN)/release
 	BUILD_DIST=$(RELEASE_DIST)
 endif

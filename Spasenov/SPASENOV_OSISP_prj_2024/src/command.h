@@ -1,6 +1,5 @@
 #include "gui.h"
 #include <stdio.h>
-#include <stdio.h>
 #include <string.h>
 #include <ncurses.h>
 #include <sys/types.h>
@@ -9,9 +8,9 @@
 #include <unistd.h>
 
 #define MAX_LENGTH 256
-#define PATH_MAX 256
-enum
-  {
+#define PATH_MAX 257
+
+enum {  
     DT_UNKNOWN = 0,
 # define DT_UNKNOWN	DT_UNKNOWN
     DT_FIFO = 1,
@@ -32,6 +31,13 @@ enum
 # define DT_WHT		DT_WHT
   };
 
-void handle_input(WINDOW *search_win, WINDOW *results_win);
+extern int scandir (const char *__restrict __dir,
+		    struct dirent ***__restrict __namelist,
+		    int (*__selector) (const struct dirent *),
+		    int (*__cmp) (const struct dirent **,
+				  const struct dirent **))
+     __nonnull ((1, 2));
 
-int search_directory(WINDOW *search_win, WINDOW *results_win, const char *input, const char *path, const char *results[], int selected_index, int cousor_position);
+void handleInput(WINDOW *searchWin, WINDOW *resultsWin);
+
+int searchDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition);

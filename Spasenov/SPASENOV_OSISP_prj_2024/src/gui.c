@@ -1,75 +1,72 @@
 #include "gui.h"
 
-void render_search_window(WINDOW *search_win, const char *search_query, int cursor_position) {
-    werase(search_win);
-    box(search_win, 0, 0);
-    for (int i = 0; i < strlen(search_query); i++) {
-        if (i == cursor_position) {
-            wattron(search_win, A_STANDOUT);  // Включение выделения для выбранного символа
+void renderSearchWindow(WINDOW *searchWin, const char *searchQuery, int cursorPosition) {
+    werase(searchWin);
+    box(searchWin, 0, 0);
+    for (int i = 0; i < (int)strlen(searchQuery); i++) {
+        if (i == cursorPosition) {
+            wattron(searchWin, A_STANDOUT);
         }
-        mvwprintw(search_win, 1, 1 + i, "%c", search_query[i]);
-        if (i == cursor_position) {
-            wattroff(search_win, A_STANDOUT);  // Выключение выделения
+        mvwprintw(searchWin, 1, 1 + i, "%c", searchQuery[i]);
+        if (i == cursorPosition) {
+            wattroff(searchWin, A_STANDOUT);
         }
     }
 
-    if (cursor_position == strlen(search_query)) {
-        wattron(search_win, A_STANDOUT);
-        mvwprintw(search_win, 1, strlen(search_query) + 1, " ");
-        wattroff(search_win, A_STANDOUT);
+    if (cursorPosition == (int)strlen(searchQuery)) {
+        wattron(searchWin, A_STANDOUT);
+        mvwprintw(searchWin, 1, strlen(searchQuery) + 1, " ");
+        wattroff(searchWin, A_STANDOUT);
     }
 
-    wmove(search_win, 1, 1 + cursor_position);
-    wrefresh(search_win);
+    wmove(searchWin, 1, 1 + cursorPosition);
+    wrefresh(searchWin);
 }
 
-void render_info_window(WINDOW **info_win) {
+void renderInfoWindow(WINDOW **infoWin) {
     int rows, cols;
-    getmaxyx(stdscr, rows, cols);  // Получение размеров терминала
-    int info_win_height = rows - 2;  // Высота окна информации
-    int info_win_width = cols - 2;  // Ширина окна информации
-    int info_win_y = 1;  // Положение окна информации по вертикали
-    int info_win_x = 1;  // Положение окна информации по горизонтали
+    getmaxyx(stdscr, rows, cols);
+    int infoWinHeight = rows - 2;
+    int infoWinWidth = cols - 2;
+    int infoWinY = 1;
+    int infoWinX = 1;
 
-    // Создание информационного окна
-    *info_win = newwin(info_win_height, info_win_width, info_win_y, info_win_x);
-    box(*info_win, 0, 0);  // Отрисовка рамки вокруг окна информации
+    *infoWin = newwin(infoWinHeight, infoWinWidth, infoWinY, infoWinX);
+    box(*infoWin, 0, 0);
 
-    // Очистка и обновление информационного окна
-    wclear(*info_win);  // Очистка окна информации
-    box(*info_win, 0, 0);  // Отрисовка рамки вокруг окна информации
+    wclear(*infoWin);
+    box(*infoWin, 0, 0);
 
-    int text_length = strlen(ABOUT_PROGRAMM);
-    int position_x = (info_win_width - text_length) / 2;
-    int position_y = info_win_height / 2;
+    int textLength = strlen(ABOUT_PROGRAMM);
+    int positionX = (infoWinWidth - textLength) / 2;
+    int positionY = infoWinHeight / 2;
 
-    mvwprintw(*info_win, position_y, position_x, ABOUT_PROGRAMM);  // Вывод информации
-    wrefresh(*info_win);  // Обновление окна информации
+    mvwprintw(*infoWin, positionY, positionX, ABOUT_PROGRAMM);
+    wrefresh(*infoWin);
 
-    // Пометка информационного окна для обновления
     touchwin(stdscr);
 }
 
-void render_results_window(WINDOW *win, const char *results[], int num_results, int selected_index) {
+void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int selectedIndex) {
     werase(win);
     box(win, 0, 0);
-    for (int i = 0; i < num_results; i++) {
-        if (i == selected_index) {
+    for (int i = 0; i < numResults; i++) {
+        if (i == selectedIndex) {
             wattron(win, A_STANDOUT);
         }
         mvwprintw(win, i + 1, 1, "%s", results[i]);
-        if (i == selected_index) {
+        if (i == selectedIndex) {
             wattroff(win, A_STANDOUT);
         }
     }
-    int terminal_width = getmaxx(stdscr);  // Получаем ширину терминала
-    int x = (terminal_width - strlen(NAVIGATION)) / 2; 
+    int terminalWidth = getmaxx(stdscr);
+    int x = (terminalWidth - strlen(NAVIGATION)) / 2; 
     mvprintw(LINES - 1, x, NAVIGATION);
     refresh();
     wrefresh(win);
 }
 
-mainWindow* render_main_window() {
+mainWindow* renderMainWindow() {
     mainWindow *window = malloc(sizeof(mainWindow));
 
     WINDOW *searchWin = newwin(search_win_height, COLS - 2, 0, 1);

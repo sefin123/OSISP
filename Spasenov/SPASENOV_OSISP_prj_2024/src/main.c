@@ -6,9 +6,9 @@ int main() {
     cbreak();
     noecho();
 
-    mainWindow *window = render_main_window();
+    mainWindow *window = renderMainWindow();
 
-    handle_input(window->searchWin, window->resultWin);
+    handleInput(window->searchWin, window->resultWin);
 
     delwin(window->searchWin);
     delwin(window->resultWin);
