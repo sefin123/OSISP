@@ -1,4 +1,4 @@
-#include "command.h"
+#include "search.h"
 
 char input[MAX_LENGTH] = "";
 int inputLength = 0;
@@ -73,6 +73,76 @@ void writePath(const char* path) {
     refresh();
 }
 
+void keyDownHandler(WINDOW* win) {
+    if (selectedIndex < numResults - 1) {
+        selectedIndex++;
+        renderResultsWindow(win, results, numResults, selectedIndex);
+    }
+}
+
+void keyBackspaseHandler() {
+    if (inputLength > 0) {
+        for (int i = cursorPosition; i < inputLength; i++) {
+            input[i - 1] = input[i];
+        }
+        inputLength--;
+        cursorPosition--;
+        if(cursorPosition == -1) cursorPosition = 0;
+        if(selectedIndex > numResults) selectedIndex = numResults;
+        input[inputLength] = '\0';
+    }
+}
+
+void keyUpHandler(WINDOW* resultsWin) {
+    if (selectedIndex > 0) {
+        if (selectedIndex > numResults) selectedIndex = numResults;
+        selectedIndex--;
+        renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+    }
+}
+
+void keyRightHandler() {
+    if (cursorPosition < inputLength) {
+        cursorPosition++;
+    }
+}
+
+void keyLeftHandler() {
+    if (cursorPosition > 0) {
+        cursorPosition--;
+    }
+}
+
+void keyEnterHandler() {
+    writePath(results[selectedIndex]);
+    strcpy(input, results[selectedIndex]);
+    cursorPosition = 0;
+    inputLength = (int)strlen(results[selectedIndex]);
+}
+
+void keyF3Handler(WINDOW* resultsWin, WINDOW* searchWin) {
+    aboutHandler();
+}
+
+void keyF2Handler() {
+    historyHandler();
+}
+
+void keyF1Handler() {
+    parametrsHandler();
+}
+
+void writeHandler(int ch) {
+    if (ch >= 32 && ch <= 126 && inputLength < MAX_LENGTH - 1) {
+        for (int i = inputLength; i > cursorPosition; i--) {
+            input[i] = input[i - 1];
+        }
+        input[cursorPosition++] = ch;
+        inputLength++;
+        input[inputLength] = '\0';
+    }
+}
+
 void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
 
     numResults = searchDirectory(searchWin, resultsWin, input, path, results, 0, cursorPosition);
@@ -81,86 +151,52 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
 
         int ch = wgetch(searchWin);
         switch (ch) {
-            case 27:  // Escape key
+            case KEY_F(4):
                 return;
             case KEY_BACKSPACE: {
-                if (inputLength > 0) {
-                    for (int i = cursorPosition; i < inputLength; i++) {
-                        input[i - 1] = input[i];
-                    }
-                    inputLength--;
-                    cursorPosition--;
-                    if(cursorPosition == -1) cursorPosition = 0;
-                    if(selectedIndex > numResults) selectedIndex = numResults;
-                    input[inputLength] = '\0';
-                }
+                keyBackspaseHandler();
             break;
             }
             case KEY_DOWN: {
-                if (selectedIndex < numResults - 1) {
-                    selectedIndex++;
-                    renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-                }
+                keyDownHandler(resultsWin);
             break;
             }
             case KEY_UP: {
-                if (selectedIndex > 0) {
-                    if (selectedIndex > numResults) selectedIndex = numResults;
-                    selectedIndex--;
-                    renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-                }
+                keyUpHandler(resultsWin);
             break;
             }
             case KEY_LEFT: {
-                if (cursorPosition > 0) {
-                    cursorPosition--;
-                }
+                keyLeftHandler();
             break;
             }
             case KEY_RIGHT: {
-                if (cursorPosition < inputLength) {
-                    cursorPosition++;
-                }
+                keyRightHandler();
             break;
             }
-            case 10: { //Enter key
-                writePath(results[selectedIndex]);
-                strcpy(input, results[selectedIndex]);
-                cursorPosition = 0;
-                inputLength = (int)strlen(results[selectedIndex]);
-                break;
+            case 10: { //Enter
+                keyEnterHandler();
+            break;
             }
             case KEY_F(3): {
-                WINDOW *infoWin;
-                renderInfoWindow(&infoWin);
-
-                keypad(infoWin, TRUE);
-
-                int simbol;
-                while (true) {
-                    simbol = wgetch(infoWin);
-                    if (simbol == KEY_F(1)) {
-                    break;
-                    }
-                }
+                keyF3Handler(resultsWin, searchWin);
                 renderResultsWindow(resultsWin, results, numResults, selectedIndex);
                 renderSearchWindow(searchWin, input, cursorPosition);
-                delwin(infoWin);
                 break;   
             }
+            case KEY_F(2): {
+                keyF2Handler();
+                break;
+            }
+            case KEY_F(1): {
+                keyF1Handler();
+                break;
+            }
             default: {
-                if (ch >= 32 && ch <= 126 && inputLength < MAX_LENGTH - 1) {
-                    for (int i = inputLength; i > cursorPosition; i--) {
-                        input[i] = input[i - 1];
-                    }
-                    input[cursorPosition++] = ch;
-                    inputLength++;
-                    input[inputLength] = '\0';
-                }
+                writeHandler(ch);
             break;
             }
-        renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-        renderSearchWindow(searchWin, input, cursorPosition);
+            renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+            renderSearchWindow(searchWin, input, cursorPosition);
         }
         numResults = searchDirectory(searchWin, resultsWin, input, path, results, selectedIndex, cursorPosition);
     }

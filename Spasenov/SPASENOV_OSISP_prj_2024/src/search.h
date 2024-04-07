@@ -1,4 +1,6 @@
-#include "gui.h"
+#include "parametrs.h"
+#include "about.h"
+#include "history.h"
 #include <stdio.h>
 #include <string.h>
 #include <ncurses.h>

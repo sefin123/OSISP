@@ -3,3 +3,4 @@
 ./Makefile
 ./.vscode/tasks.json
 ./.vscode/tasks.json
+./build/debug/command.o

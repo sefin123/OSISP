@@ -1,29 +1,46 @@
 #include "gui.h"
 
-void renderSearchWindow(WINDOW *searchWin, const char *searchQuery, int cursorPosition) {
-    werase(searchWin);
-    box(searchWin, 0, 0);
+void renderSearchWindow(WINDOW *win, const char *searchQuery, int cursorPosition) {
+    werase(win);
+    box(win, 0, 0);
     for (int i = 0; i < (int)strlen(searchQuery); i++) {
         if (i == cursorPosition) {
-            wattron(searchWin, A_STANDOUT);
+            wattron(win, A_STANDOUT);
         }
-        mvwprintw(searchWin, 1, 1 + i, "%c", searchQuery[i]);
+        mvwprintw(win, 1, 1 + i, "%c", searchQuery[i]);
         if (i == cursorPosition) {
-            wattroff(searchWin, A_STANDOUT);
+            wattroff(win, A_STANDOUT);
         }
     }
 
     if (cursorPosition == (int)strlen(searchQuery)) {
-        wattron(searchWin, A_STANDOUT);
-        mvwprintw(searchWin, 1, strlen(searchQuery) + 1, " ");
-        wattroff(searchWin, A_STANDOUT);
+        wattron(win, A_STANDOUT);
+        mvwprintw(win, 1, strlen(searchQuery) + 1, " ");
+        wattroff(win, A_STANDOUT);
     }
 
-    wmove(searchWin, 1, 1 + cursorPosition);
-    wrefresh(searchWin);
+    wmove(win, 1, 1 + cursorPosition);
+    wrefresh(win);
 }
 
-void renderInfoWindow(WINDOW **infoWin) {
+void renderParametrsWindow(WINDOW** win) {
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
+
+    *win = newwin(windowHeight - 1, windowWidth, 0, 0);
+    box(*win, 0, 0);
+    refresh();
+    wrefresh(*win);
+    keypad(*win, TRUE);
+    mvwprintw(*win, 1, 2, "Parametrs for utility find: ");
+    int terminalWidth = getmaxx(stdscr);
+    int x = (terminalWidth - strlen(NAVIGATION)) / 2; 
+    mvprintw(LINES - 1, x, NAVIGATION);
+    refresh();
+    wrefresh(*win);
+}
+
+void renderInfoWindow(WINDOW **win) {
     int rows, cols;
     getmaxyx(stdscr, rows, cols);
     int infoWinHeight = rows - 2;
@@ -31,18 +48,17 @@ void renderInfoWindow(WINDOW **infoWin) {
     int infoWinY = 1;
     int infoWinX = 1;
 
-    *infoWin = newwin(infoWinHeight, infoWinWidth, infoWinY, infoWinX);
-    box(*infoWin, 0, 0);
-
-    wclear(*infoWin);
-    box(*infoWin, 0, 0);
+    *win = newwin(infoWinHeight, infoWinWidth, infoWinY, infoWinX);
+    box(*win, 0, 0);
+    wclear(*win);
+    box(*win, 0, 0);
 
     int textLength = strlen(ABOUT_PROGRAMM);
     int positionX = (infoWinWidth - textLength) / 2;
     int positionY = infoWinHeight / 2;
 
-    mvwprintw(*infoWin, positionY, positionX, ABOUT_PROGRAMM);
-    wrefresh(*infoWin);
+    mvwprintw(*win, positionY, positionX, ABOUT_PROGRAMM);
+    wrefresh(*win);
 
     touchwin(stdscr);
 }
