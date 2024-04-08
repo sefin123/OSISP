@@ -30,8 +30,6 @@ int printHistory(WINDOW* win, char *result[]) {
         char *res = malloc(strlen(str) + 1);
         strcpy(res, str);
         result[numHistoryResults++] = res;
-        mvwprintw(win, 20, 1, "selected: %d", selectedHistoryIndex);
-        mvwprintw(win, 21, 1, "num: %d", numHistoryResults);
 
         if(i == selectedHistoryIndex) {
             wattron(win, A_STANDOUT);
