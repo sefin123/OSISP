@@ -19,11 +19,11 @@ void keyDownHistoryHandler() {
 }
 
 int printHistory(WINDOW* win, char *result[]) {
-    FILE* historyFile = fopen("History.txt", "r+");
+    FILE* file = fopen("History.txt", "r+");
     int numHistoryResults = 0;
     char str[MAX_LENGTH];
     int i = 0;
-    while (fgets(str, MAX_LENGTH, historyFile) != NULL) {
+    while (fgets(str, MAX_LENGTH, file) != NULL) {
         if (str[strlen(str) - 1] == '\n') {
             str[strlen(str) - 1] = '\0';
         }
@@ -42,7 +42,7 @@ int printHistory(WINDOW* win, char *result[]) {
         i++;
     }
     
-    fclose(historyFile);
+    fclose(file);
     return numHistoryResults;
 }
 
@@ -97,7 +97,7 @@ char* historyHandler() {
                 keyBackspaseHistoryHandler();
             }
         renderHistoryWindow(&win);
-        numHistoryResults = printHistory(win, result);
+        numHistoryResults = printHistory(win, result);  
     }
     delwin(win);
     endwin();

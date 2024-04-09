@@ -23,8 +23,17 @@ void renderSearchWindow(WINDOW *win, const char *searchQuery, int cursorPosition
     wrefresh(win);
 }
 
-void renderParametrsWindow(WINDOW** win) {
+void renderParametrsWindow(WINDOW** win, int selectedIndex) {
     int windowHeight, windowWidth;
+    const char* parameters[] = {
+        "Parametrs for utility find: ",
+        "File",
+        "Directory",
+        "Symbol link",
+        "Search by size",
+        "Search by time modify",
+        "Is empty"
+    };
     getmaxyx(stdscr, windowHeight, windowWidth);
 
     *win = newwin(windowHeight - 1, windowWidth, 0, 0);
@@ -32,8 +41,17 @@ void renderParametrsWindow(WINDOW** win) {
     keypad(*win, TRUE);
     wclear(*win);
     box(*win, 0, 0);
-    
-    mvwprintw(*win, 1, 2, "Parametrs for utility find: ");
+
+
+    for (int i = 0; i < (int)(sizeof(parameters) / sizeof(parameters[0])); i++) {
+        if (i == selectedIndex) {
+            wattron(*win, A_STANDOUT);
+        }
+        mvwprintw(*win, i + 1, 2, "%s", parameters[i]);
+        if (i == selectedIndex) {
+            wattroff(*win, A_STANDOUT);
+        }
+    }
     
     touchwin(stdscr);
 }

@@ -33,7 +33,7 @@ mainWindow* renderMainWindow();
 
 void renderAboutWindow(WINDOW **win);
 
-void renderParametrsWindow(WINDOW** win);
+void renderParametrsWindow(WINDOW** win, int selectedIndex);
 
 void renderHistoryWindow(WINDOW** win);
 

@@ -1,11 +1,12 @@
 #include "search.h"
 
+//Parametrs parametr = NULL;
 char input[MAX_LENGTH] = "";
 int inputLength = 0;
 int selectedIndex = 0;
 const char *results[MAX_LENGTH];
 int numResults = 0;
-char path[MAX_LENGTH] = ".";
+char path[MAX_LENGTH] = ".";    
 int cursorPosition = 0;
 
 int compareFilenames(const void *a, const void *b) {
@@ -131,7 +132,7 @@ void keyF2Handler() {
 }
 
 void keyF1Handler() {
-    parametrsHandler();
+    return parametrsHandler();
 }
 
 void writeHandler(int ch) {
@@ -146,7 +147,7 @@ void writeHandler(int ch) {
 }
 
 void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
-
+    
     numResults = printDirectory(searchWin, resultsWin, input, path, results, 0, cursorPosition);
 
     while (true) {
