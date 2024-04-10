@@ -1,38 +1,37 @@
 #include "gui.h"
 
-void renderSearchWindow(WINDOW *win, const char *searchQuery, int cursorPosition) {
-    werase(win);
-    box(win, 0, 0);
-    for (int i = 0; i < (int)strlen(searchQuery); i++) {
+void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition) {
+    werase(*win);
+    box(*win, 0, 0);
+    for (int i = 0; i < (int)strlen(result); i++) {
         if (i == cursorPosition) {
-            wattron(win, A_STANDOUT);
+            wattron(*win, A_STANDOUT);
         }
-        mvwprintw(win, 1, 1 + i, "%c", searchQuery[i]);
+        mvwprintw(*win, 1, 1 + i, "%c", result[i]);
         if (i == cursorPosition) {
-            wattroff(win, A_STANDOUT);
+            wattroff(*win, A_STANDOUT);
         }
     }
-
-    if (cursorPosition == (int)strlen(searchQuery)) {
-        wattron(win, A_STANDOUT);
-        mvwprintw(win, 1, strlen(searchQuery) + 1, " ");
-        wattroff(win, A_STANDOUT);
+    if (cursorPosition == (int)strlen(result)) {
+        wattron(*win, A_STANDOUT);
+        mvwprintw(*win, 1, strlen(result) + 1, " ");
+        wattroff(*win, A_STANDOUT);
     }
 
-    wmove(win, 1, 1 + cursorPosition);
-    wrefresh(win);
+    wmove(*win, 1, 1 + cursorPosition);
+    wrefresh(*win);
 }
 
 void renderParametrsWindow(WINDOW** win, int selectedIndex) {
     int windowHeight, windowWidth;
     const char* parameters[] = {
         "Parametrs for utility find: ",
-        "File",
-        "Directory",
-        "Symbol link",
-        "Search by size",
-        "Search by time modify",
-        "Is empty"
+        "Search files",
+        "Search directoreis",
+        "Search symbol links",
+        "Search by size(g,m,k,c,w)",
+        "Search by time modify(s,m,h)",
+        "Search empty files"
     };
     getmaxyx(stdscr, windowHeight, windowWidth);
 

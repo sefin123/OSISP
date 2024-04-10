@@ -54,7 +54,7 @@ int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, con
 
     qsort(results, numResults, sizeof(const char *), compareFilenames);
 
-    renderSearchWindow(searchWin, input, cousorPosition);
+    renderWriteWindow(&searchWin, input, cousorPosition);
     renderResultsWindow(resultsWin, results, numResults, selectedIndex);
     
     return numResults;
@@ -132,7 +132,7 @@ void keyF2Handler() {
 }
 
 void keyF1Handler() {
-    return parametrsHandler();
+    parametrsHandler();
 }
 
 void writeHandler(int ch) {
@@ -183,7 +183,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             case KEY_F(3): {
                 keyF3Handler();
                 renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-                renderSearchWindow(searchWin, input, cursorPosition);
+                renderWriteWindow(&searchWin, input, cursorPosition);
                 break;   
             }
             case KEY_F(2): {
@@ -193,7 +193,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             case KEY_F(1): {
                 keyF1Handler();
                 renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-                renderSearchWindow(searchWin, input, cursorPosition);
+                renderWriteWindow(&searchWin, input, cursorPosition);
                 break;
             }
             default: {
@@ -202,7 +202,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             }
         }
         renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-        renderSearchWindow(searchWin, input, cursorPosition);
+        renderWriteWindow(&searchWin, input, cursorPosition);
         numResults = printDirectory(searchWin, resultsWin, input, path, results, selectedIndex, cursorPosition);
     }
 }

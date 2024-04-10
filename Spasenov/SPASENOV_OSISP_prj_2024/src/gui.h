@@ -11,6 +11,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 
 #define MAX_LENGTH 256
 
@@ -25,8 +26,6 @@ typedef struct mainWindow {
     WINDOW *resultWin;
 } mainWindow;
 
-void renderSearchWindow(WINDOW *win, const char *searchQuery, int cursorPosition);
-
 void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int selectedIndex);
 
 mainWindow* renderMainWindow();
@@ -36,5 +35,7 @@ void renderAboutWindow(WINDOW **win);
 void renderParametrsWindow(WINDOW** win, int selectedIndex);
 
 void renderHistoryWindow(WINDOW** win);
+
+void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition);
 
 #endif

@@ -1,13 +1,15 @@
 #include "gui.h"
 
 typedef struct sizeFlag{
-    long fileSize;
+    long size;
     bool isEnable;
+    bool isMore;
 }sizeFlag;
 
 typedef struct timeFlag{
     time_t time;
     bool isEnable;
+    bool isMore;
 }timeFlag;
 
 typedef struct Parametrs {
@@ -21,4 +23,4 @@ typedef struct Parametrs {
 
 #define numParametrs 7
 
-void parametrHandler();
+Parametrs parametrsHandler();
