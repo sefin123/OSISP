@@ -29,7 +29,7 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
         "Search files",
         "Search directoreis",
         "Search symbol links",
-        "Search by size(g,m,k,c,w)",
+        "Search by size(g,m,k,c,w,b)",
         "Search by time modify(s,m,h)",
         "Search empty files"
     };

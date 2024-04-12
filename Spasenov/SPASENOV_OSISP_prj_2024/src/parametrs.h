@@ -23,4 +23,6 @@ typedef struct Parametrs {
 
 #define numParametrs 7
 
-Parametrs parametrsHandler();
+Parametrs* parametrsHandler(Parametrs *para);
+
+Parametrs* allocateMemory();

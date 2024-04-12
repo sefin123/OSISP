@@ -30,15 +30,17 @@ long convertToLong() {
     long size = strtol(sizeFlagInput, &endPtr, 10);
     
     if (*endPtr == 'G' || *endPtr == 'g') {
-        size *= 1024 * 1024 * 1024;  // Умножаем на 1 гигабайт (1024 * 1024 * 1024 байт)
+        size = labs(size) * 1024 * 1024 * 1024;  // Умножаем на 1 гигабайт (1024 * 1024 * 1024 байт)
     } else if (*endPtr == 'M' || *endPtr == 'm') {
-        size *= 1024 * 1024;         // Умножаем на 1 мегабайт (1024 * 1024 байт)
+        size = labs(size) * 1024 * 1024;         // Умножаем на 1 мегабайт (1024 * 1024 байт)
     } else if (*endPtr == 'K' || *endPtr == 'k') {
-        size *= 1024;                // Умножаем на 1 килобайт (1024 байт)
+        size = labs(size) * 1024;                // Умножаем на 1 килобайт (1024 байт)
     } else if (*endPtr == 'c') {
-        size *= 512;                 // Умножаем на 512 байт (размер блока по умолчанию)
+        size = labs(size) * 512;                 // Умножаем на 512 байт (размер блока по умолчанию)
     }  else if (*endPtr == 'w') {
-        size *= 2;                   // Умножаем на 2 байта (размер слова)
+        size = labs(size) * 2;                   // Умножаем на 2 байта (размер слова)
+    } else if (*endPtr == 'b') {
+        return labs(size);
     } else {
         return -1;                   // Возвращаем ошибку или другое значение по вашему усмотрению
     }
@@ -54,11 +56,11 @@ time_t convertToTime() {
     struct tm *timeInfo = localtime(&currentTime);
 
         if (unit == 's') {
-            timeInfo->tm_sec += value;
+            timeInfo->tm_sec -= labs(value);
         } else if (unit == 'm') {
-            timeInfo->tm_min += value;
+            timeInfo->tm_min -= labs(value);
         } else if (unit == 'h') {
-            timeInfo->tm_hour += value;
+            timeInfo->tm_hour -= labs(value);
         } else {
             return -1;
         }
@@ -94,6 +96,15 @@ bool turnFlag(bool flag) {
     return flag ? false : true;
 }
 
+void updateIsTurn() {
+        isTurnFlags[0] = parametrs->fileFlag ? true : false; 
+        isTurnFlags[1] = parametrs->directoryFlag ? true : false;
+        isTurnFlags[2] = parametrs->symlinkFlag ? true : false;
+        isTurnFlags[3] = parametrs->sizeFileFlag->isEnable ? true : false;
+        isTurnFlags[4] = parametrs->timeFileFlag->isEnable ? true : false;
+        isTurnFlags[5] = parametrs->emptyFlag ? true : false;
+}
+
 void keyEnterParametrsHandler() {
     if (selectedparametrIndex == 1) {
         parametrs->fileFlag = turnFlag(parametrs->fileFlag);
@@ -108,12 +119,10 @@ void keyEnterParametrsHandler() {
         isTurnFlags[2] = parametrs->symlinkFlag ? true : false;
     }
     if (selectedparametrIndex == 4) {
-        parametrs->sizeFileFlag->isMore = (sizeFlagInput[0] == '+') ? true : false;
         parametrs->sizeFileFlag->isEnable = turnFlag(parametrs->sizeFileFlag->isEnable);
         isTurnFlags[3] = parametrs->sizeFileFlag->isEnable ? true : false;
     }
     if (selectedparametrIndex == 5) {
-        parametrs->timeFileFlag->isMore = (timeFlagInput[0] == '+') ? true : false;
         parametrs->timeFileFlag->isEnable = turnFlag(parametrs->timeFileFlag->isEnable);
         isTurnFlags[4] = parametrs->timeFileFlag->isEnable ? true : false;
     }
@@ -123,7 +132,7 @@ void keyEnterParametrsHandler() {
     }
 }
 
-char* writeValueParamtr(char* input) {
+char* writeValueParamtrs(char* input) {
     int inputLength = 0;
     int cursorPosition = 0;
     while(true) {
@@ -177,15 +186,17 @@ char* writeValueParamtr(char* input) {
 void keyRightParametrsHandler() {
     if (selectedparametrIndex == 4) {
         renderWriteWindow(&writeWin, sizeFlagInput, 0);
-        strcpy(sizeFlagInput, writeValueParamtr(sizeFlagInput));
+        strcpy(sizeFlagInput, writeValueParamtrs(sizeFlagInput));
         parametrs->sizeFileFlag->size = convertToLong();
+        parametrs->sizeFileFlag->isMore = (sizeFlagInput[0] == '+') ? true : false;
         printIsTurnParametr();
     }
 
     if (selectedparametrIndex == 5) {
         renderWriteWindow(&writeWin, timeFlagInput, 0);
-        strcpy(timeFlagInput, writeValueParamtr(timeFlagInput));
+        strcpy(timeFlagInput, writeValueParamtrs(timeFlagInput));
         parametrs->timeFileFlag->time = convertToTime();
+        parametrs->timeFileFlag->isMore = (timeFlagInput[0] == '+') ? true : false;
         printIsTurnParametr();
     }
 }
@@ -193,37 +204,39 @@ void keyRightParametrsHandler() {
 Parametrs* allocateMemory() {
     Parametrs *parametrs = malloc(sizeof(Parametrs));
 
-    parametrs->fileFlag = true;
+    parametrs->fileFlag = false;
     parametrs->directoryFlag = true;
     parametrs->symlinkFlag = true;
     parametrs->sizeFileFlag = malloc(sizeof(sizeFlag));
     parametrs->sizeFileFlag->size = 0;
     parametrs->sizeFileFlag->isEnable = false;
-    parametrs->sizeFileFlag->isMore = false;
-    parametrs->sizeFileFlag->isMore = false;
+    parametrs->sizeFileFlag->isMore = true;
     parametrs->timeFileFlag = malloc(sizeof(timeFlag));
     parametrs->timeFileFlag->time = 0;
     parametrs->timeFileFlag->isEnable = false;
+    parametrs->timeFileFlag->isMore = false;
     parametrs->emptyFlag = false;
 
     return parametrs;
 }
 
-Parametrs parametrsHandler() {
+Parametrs* parametrsHandler(Parametrs *para) {
 
     renderParametrsWindow(&win, selectedparametrIndex);
 
     writeWin = newwin(search_win_height, COLS - 2, 8, 1);
     keypad(writeWin, TRUE);
     
-    parametrs = allocateMemory();
+    parametrs = para;
     
+    updateIsTurn();
+
     printIsTurnParametr();
     
     while (true) {
         int ch = wgetch(win);
         if (ch == KEY_F(4)) {
-            return *parametrs;
+            return parametrs;
         }
         if (ch == KEY_UP) {
             keyUpParametrsHandler();

@@ -1,6 +1,6 @@
 #include "search.h"
 
-//Parametrs parametr = NULL;
+Parametrs* parametr;
 char input[MAX_LENGTH] = "";
 int inputLength = 0;
 int selectedIndex = 0;
@@ -11,6 +11,86 @@ int cursorPosition = 0;
 
 int compareFilenames(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
+}
+
+void saveResult(const char *fullPath, const char *input, const char *results[],
+                 int *numResults) {
+    if (strstr(fullPath, input) != NULL) {
+        char *result = malloc(strlen(fullPath) + 1);
+        strcpy(result, fullPath);
+        results[(*numResults)++] = result;
+    }
+}
+
+void processSizeFlag(const char *filePath, const char *input, const char *results[],
+                     int *numResults, Parametrs *param) {
+    FILE* file = fopen(filePath, "r");
+
+    if (file == NULL) {
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+
+    fclose(file);
+
+    if (param->sizeFileFlag->isMore && fileSize > param->sizeFileFlag->size) {
+        saveResult(filePath, input, results, numResults);
+    }
+
+    if (!param->sizeFileFlag->isMore && fileSize < param->sizeFileFlag->size) {
+        saveResult(filePath, input, results, numResults);
+    }
+}
+
+void processTimeFlag(const char *filePath, const char *input, const char *results[],
+                     int *numResults, Parametrs *param) {
+    struct stat fileStat;
+    if (lstat(filePath, &fileStat) == 0) {
+        struct tm *modificationTime = localtime(&fileStat.st_mtime);
+
+        if (param->timeFileFlag->isMore && mktime(modificationTime) > param->timeFileFlag->time) {
+            saveResult(filePath, input, results, numResults);
+        }
+
+        if (!param->timeFileFlag->isMore && mktime(modificationTime) < param->timeFileFlag->time) {
+            saveResult(filePath, input, results, numResults);
+        }
+    }
+
+}
+
+void processEntry(const char *fullPath, const char *input, const char *results[],
+                  int *numResults, Parametrs *param) {
+    struct stat fileStat;
+    if (lstat(fullPath, &fileStat) == 0) {
+        if (param->sizeFileFlag->isEnable) {
+            processSizeFlag(fullPath, input, results, numResults, param);
+        } else if (param->timeFileFlag->isEnable) {
+            processTimeFlag(fullPath, input, results, numResults, param);
+        } else {
+            saveResult(fullPath, input, results, numResults);
+        }
+    }
+}
+
+void processEmptyFile(const char *fullPath, const char *input, const char *results[],
+                 int *numResults) {
+    FILE* file = fopen(fullPath, "r");
+
+    if (file == NULL) {
+        fprintf(stderr, "asdasdasdasdasd\n");
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+
+    fclose(file);
+    if (fileSize == 0) {
+        saveResult(fullPath, input, results, numResults);
+    }
+    
 }
 
 void saveDirectory(const char *path, const char *input, const char *results[], int *numResults) {
@@ -24,21 +104,26 @@ void saveDirectory(const char *path, const char *input, const char *results[], i
                 continue;
             }
 
-            if (dir[n]->d_type == DT_REG || dir[n]->d_type == DT_DIR || dir[n]->d_type == DT_LNK) {
-                char fullPath[PATH_MAX];
-                snprintf(fullPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
+            char fullPath[PATH_MAX];
+            snprintf(fullPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
 
-                if (strstr(fullPath, input) != NULL) {
-                    char *result = malloc(strlen(fullPath) + 1);
-                    strcpy(result, fullPath);
-                    results[(*numResults)++] = result;
+            struct stat fileStat;
+            if (lstat(fullPath, &fileStat) == 0) {
+                if (parametr->fileFlag && S_ISREG(fileStat.st_mode)) {
+                    processEntry(fullPath, input, results, numResults, parametr);
+                }
+                if (parametr->directoryFlag && S_ISDIR(fileStat.st_mode)) {
+                    processEntry(fullPath, input, results, numResults, parametr);
+                }
+                if (parametr->symlinkFlag && S_ISLNK(fileStat.st_mode)) {
+                    processEntry(fullPath, input, results, numResults, parametr);
+                }
+                if (parametr->emptyFlag && S_ISREG(fileStat.st_mode)) {
+                    processEmptyFile(fullPath, input, results, numResults);
                 }
             }
-
-            if (dir[n]->d_type == DT_DIR) {
-                char newPath[PATH_MAX];
-                snprintf(newPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
-                saveDirectory(newPath, input, results, numResults);
+            if (S_ISDIR(fileStat.st_mode)) {
+                saveDirectory(fullPath, input, results, numResults);
             }
 
             free(dir[n]);
@@ -48,7 +133,10 @@ void saveDirectory(const char *path, const char *input, const char *results[], i
     }
 }
 
-int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition) {
+int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input,
+                    const char *path, const char *results[], int selectedIndex,
+                     int cousorPosition) {
+
     int numResults = 0;
     saveDirectory(path, input, results, &numResults);
 
@@ -132,7 +220,7 @@ void keyF2Handler() {
 }
 
 void keyF1Handler() {
-    parametrsHandler();
+    parametr = parametrsHandler(parametr);
 }
 
 void writeHandler(int ch) {
@@ -146,9 +234,25 @@ void writeHandler(int ch) {
     }
 }
 
+Parametrs* initParametrs() {
+    parametr = allocateMemory();
+
+    parametr->directoryFlag = true;
+    parametr->fileFlag = true;
+    parametr->symlinkFlag = true;
+    parametr->sizeFileFlag->isMore = true;
+    parametr->timeFileFlag->isMore = true;
+
+    return parametr;
+}
+
 void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
     
-    numResults = printDirectory(searchWin, resultsWin, input, path, results, 0, cursorPosition);
+    parametr = initParametrs();
+
+    numResults = printDirectory(searchWin, resultsWin, input,
+                                path, results, 0,
+                                cursorPosition);
 
     while (true) {
 
@@ -182,8 +286,10 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             }
             case KEY_F(3): {
                 keyF3Handler();
-                renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-                renderWriteWindow(&searchWin, input, cursorPosition);
+                renderResultsWindow(resultsWin, results,
+                                    numResults, selectedIndex);
+                renderWriteWindow(&searchWin, input,
+                                  cursorPosition);
                 break;   
             }
             case KEY_F(2): {
@@ -192,8 +298,11 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             }
             case KEY_F(1): {
                 keyF1Handler();
-                renderResultsWindow(resultsWin, results, numResults, selectedIndex);
-                renderWriteWindow(&searchWin, input, cursorPosition);
+                renderResultsWindow(resultsWin, results,
+                                    numResults, selectedIndex);
+
+                renderWriteWindow(&searchWin, input,
+                                  cursorPosition);
                 break;
             }
             default: {
@@ -203,6 +312,8 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
         }
         renderResultsWindow(resultsWin, results, numResults, selectedIndex);
         renderWriteWindow(&searchWin, input, cursorPosition);
-        numResults = printDirectory(searchWin, resultsWin, input, path, results, selectedIndex, cursorPosition);
+        numResults = printDirectory(searchWin, resultsWin, input,
+                                    path, results, selectedIndex,
+                                    cursorPosition);
     }
 }
