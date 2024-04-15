@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <string.h>
 #include <ncurses.h>
 #include <sys/types.h>
 #include <dirent.h>
@@ -33,7 +32,7 @@ mainWindow* renderMainWindow();
 
 void renderAboutWindow(WINDOW **win);
 
-void renderParametrsWindow(WINDOW** win, int selectedIndex);
+void renderParametrsWindow(WINDOW **win, int selectedIndex);
 
 void renderHistoryWindow(WINDOW** win);
 

@@ -1,6 +1,6 @@
 #include "search.h"
 
-Parametrs* parametr;
+Parametrs* param;
 char input[MAX_LENGTH] = "";
 int inputLength = 0;
 int selectedIndex = 0;
@@ -13,9 +13,14 @@ int compareFilenames(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
-void saveResult(const char *fullPath, const char *input, const char *results[],
-                 int *numResults) {
+void saveResult(const char *fullPath, const char *input, const char *results[], int *numResults) {
     if (strstr(fullPath, input) != NULL) {
+        for (int i = 0; i < *numResults; i++) {
+            if (strcmp(results[i], fullPath) == 0) {
+                return;
+            }
+        }
+
         char *result = malloc(strlen(fullPath) + 1);
         strcpy(result, fullPath);
         results[(*numResults)++] = result;
@@ -80,7 +85,7 @@ void processEmptyFile(const char *fullPath, const char *input, const char *resul
     FILE* file = fopen(fullPath, "r");
 
     if (file == NULL) {
-        fprintf(stderr, "asdasdasdasdasd\n");
+        return;
     }
 
     fseek(file, 0, SEEK_END);
@@ -94,43 +99,43 @@ void processEmptyFile(const char *fullPath, const char *input, const char *resul
 }
 
 void saveDirectory(const char *path, const char *input, const char *results[], int *numResults) {
-    struct dirent **dir;
-    int n = scandir(path, &dir, NULL, NULL);
+    DIR *dir;
+    struct dirent *entry;
 
-    if (n != -1) {
-        while (n--) {
-            if (strcmp(dir[n]->d_name, ".") == 0 || strcmp(dir[n]->d_name, "..") == 0) {
-                free(dir[n]);
-                continue;
-            }
+    dir = opendir(path);
+    if (dir == NULL) {
+        return;
+    }
 
-            char fullPath[PATH_MAX];
-            snprintf(fullPath, PATH_MAX, "%s/%s", path, dir[n]->d_name);
-
-            struct stat fileStat;
-            if (lstat(fullPath, &fileStat) == 0) {
-                if (parametr->fileFlag && S_ISREG(fileStat.st_mode)) {
-                    processEntry(fullPath, input, results, numResults, parametr);
-                }
-                if (parametr->directoryFlag && S_ISDIR(fileStat.st_mode)) {
-                    processEntry(fullPath, input, results, numResults, parametr);
-                }
-                if (parametr->symlinkFlag && S_ISLNK(fileStat.st_mode)) {
-                    processEntry(fullPath, input, results, numResults, parametr);
-                }
-                if (parametr->emptyFlag && S_ISREG(fileStat.st_mode)) {
-                    processEmptyFile(fullPath, input, results, numResults);
-                }
-            }
-            if (S_ISDIR(fileStat.st_mode)) {
-                saveDirectory(fullPath, input, results, numResults);
-            }
-
-            free(dir[n]);
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            continue;
         }
 
-        free(dir);
+        char fullPath[PATH_MAX];
+        snprintf(fullPath, PATH_MAX, "%s/%s", path, entry->d_name);
+
+        struct stat fileStat;
+        if (lstat(fullPath, &fileStat) == 0) {
+            if (param->fileFlag && S_ISREG(fileStat.st_mode)) {
+                processEntry(fullPath, input, results, numResults, param);
+            }
+            if (param->directoryFlag && S_ISDIR(fileStat.st_mode)) {
+                processEntry(fullPath, input, results, numResults, param);
+            }
+            if (param->symlinkFlag && S_ISLNK(fileStat.st_mode)) {
+                processEntry(fullPath, input, results, numResults, param);
+            }
+            if (param->emptyFlag && S_ISREG(fileStat.st_mode)) {
+                processEmptyFile(fullPath, input, results, numResults);
+            }
+        }
+        if (S_ISDIR(fileStat.st_mode)) {
+            saveDirectory(fullPath, input, results, numResults);
+        }
     }
+
+    closedir(dir);
 }
 
 int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input,
@@ -152,7 +157,6 @@ void writePath(const char* path) {
 
     FILE *file = fopen("History.txt", "a");
     if (file == NULL) {
-        perror("Cant open file");
         return;
     }
 
@@ -220,7 +224,7 @@ void keyF2Handler() {
 }
 
 void keyF1Handler() {
-    parametr = parametrsHandler(parametr);
+    param = parametrsHandler(param);
 }
 
 void writeHandler(int ch) {
@@ -234,21 +238,9 @@ void writeHandler(int ch) {
     }
 }
 
-Parametrs* initParametrs() {
-    parametr = allocateMemory();
-
-    parametr->directoryFlag = true;
-    parametr->fileFlag = true;
-    parametr->symlinkFlag = true;
-    parametr->sizeFileFlag->isMore = true;
-    parametr->timeFileFlag->isMore = true;
-
-    return parametr;
-}
-
 void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
     
-    parametr = initParametrs();
+    param = allocateMemory();
 
     numResults = printDirectory(searchWin, resultsWin, input,
                                 path, results, 0,

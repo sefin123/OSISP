@@ -11,6 +11,8 @@ char sizeFlagInput[MAX_LENGTH] = "";
 int sizeFlagInputLength = 0;
 char timeFlagInput[MAX_LENGTH] = "";
 int timeFlagInputLength = 0;
+int inputLengthParametrsValue = 0;
+int cursorPositionParametrsValue = 0;
 
 void keyUpParametrsHandler() {
     if (selectedparametrIndex > 1) {
@@ -30,15 +32,15 @@ long convertToLong() {
     long size = strtol(sizeFlagInput, &endPtr, 10);
     
     if (*endPtr == 'G' || *endPtr == 'g') {
-        size = labs(size) * 1024 * 1024 * 1024;  // Умножаем на 1 гигабайт (1024 * 1024 * 1024 байт)
+        size = labs(size) * 1024 * 1024 * 1024;  
     } else if (*endPtr == 'M' || *endPtr == 'm') {
-        size = labs(size) * 1024 * 1024;         // Умножаем на 1 мегабайт (1024 * 1024 байт)
+        size = labs(size) * 1024 * 1024;         
     } else if (*endPtr == 'K' || *endPtr == 'k') {
-        size = labs(size) * 1024;                // Умножаем на 1 килобайт (1024 байт)
+        size = labs(size) * 1024;                
     } else if (*endPtr == 'c') {
-        size = labs(size) * 512;                 // Умножаем на 512 байт (размер блока по умолчанию)
+        size = labs(size) * 512;                 
     }  else if (*endPtr == 'w') {
-        size = labs(size) * 2;                   // Умножаем на 2 байта (размер слова)
+        size = labs(size) * 2;                   
     } else if (*endPtr == 'b') {
         return labs(size);
     } else {
@@ -133,8 +135,10 @@ void keyEnterParametrsHandler() {
 }
 
 char* writeValueParamtrs(char* input) {
-    int inputLength = 0;
-    int cursorPosition = 0;
+
+    inputLengthParametrsValue = (int)strlen(input);
+    cursorPositionParametrsValue = (int)strlen(input);
+
     while(true) {
         int ch = wgetch(win);
         switch (ch) {
@@ -145,47 +149,50 @@ char* writeValueParamtrs(char* input) {
                 return input;
             }
             case KEY_BACKSPACE: {
-                if (inputLength > 0) {
-                    for (int i = cursorPosition; i < inputLength; i++) {
+                if (inputLengthParametrsValue > 0) {
+                    for (int i = cursorPositionParametrsValue; i < inputLengthParametrsValue; i++) {
                         input[i - 1] = input[i];
                     }
-                    inputLength--;
-                    cursorPosition--;
-                    if(cursorPosition == -1) cursorPosition = 0;
-                    input[inputLength] = '\0';
+                    inputLengthParametrsValue--;
+                    cursorPositionParametrsValue--;
+                    if(cursorPositionParametrsValue == -1) cursorPositionParametrsValue = 0;
+                    input[inputLengthParametrsValue] = '\0';
                 }
             break;
             }
             case KEY_RIGHT: {
-                if (cursorPosition < inputLength) {
-                    cursorPosition++;
+                if (cursorPositionParametrsValue < inputLengthParametrsValue) {
+                    cursorPositionParametrsValue++;
                 }
             break;
             }
             case KEY_LEFT: {
-                if (cursorPosition > 0) {
-                cursorPosition--;
+                if (cursorPositionParametrsValue > 0) {
+                cursorPositionParametrsValue--;
                 }
             break;
             }
             default: {
-                if (ch >= 32 && ch <= 126 && inputLength < MAX_LENGTH - 1) {
-                    for (int i = inputLength; i > cursorPosition; i--) {
+                if (ch >= 32 && ch <= 126 && inputLengthParametrsValue < MAX_LENGTH - 1) {
+                    for (int i = inputLengthParametrsValue; i > cursorPositionParametrsValue; i--) {
                         input[i] = input[i - 1];
                     }
-                    input[cursorPosition++] = ch;
-                    inputLength++;
-                    input[inputLength] = '\0';
+                    input[cursorPositionParametrsValue++] = ch;
+                    inputLengthParametrsValue++;
+                    input[inputLengthParametrsValue] = '\0';
                 }
             }
         }
-        renderWriteWindow(&writeWin, input, cursorPosition);
+        renderWriteWindow(&writeWin, input, cursorPositionParametrsValue);
     }
 }
 
 void keyRightParametrsHandler() {
+
+    updateIsTurn();
+    
     if (selectedparametrIndex == 4) {
-        renderWriteWindow(&writeWin, sizeFlagInput, 0);
+        renderWriteWindow(&writeWin, sizeFlagInput, cursorPositionParametrsValue);
         strcpy(sizeFlagInput, writeValueParamtrs(sizeFlagInput));
         parametrs->sizeFileFlag->size = convertToLong();
         parametrs->sizeFileFlag->isMore = (sizeFlagInput[0] == '+') ? true : false;
@@ -193,7 +200,7 @@ void keyRightParametrsHandler() {
     }
 
     if (selectedparametrIndex == 5) {
-        renderWriteWindow(&writeWin, timeFlagInput, 0);
+        renderWriteWindow(&writeWin, timeFlagInput, cursorPositionParametrsValue);
         strcpy(timeFlagInput, writeValueParamtrs(timeFlagInput));
         parametrs->timeFileFlag->time = convertToTime();
         parametrs->timeFileFlag->isMore = (timeFlagInput[0] == '+') ? true : false;
@@ -202,35 +209,56 @@ void keyRightParametrsHandler() {
 }
 
 Parametrs* allocateMemory() {
+    
     Parametrs *parametrs = malloc(sizeof(Parametrs));
 
-    parametrs->fileFlag = false;
+    parametrs->fileFlag = true;
     parametrs->directoryFlag = true;
     parametrs->symlinkFlag = true;
+ 
     parametrs->sizeFileFlag = malloc(sizeof(sizeFlag));
     parametrs->sizeFileFlag->size = 0;
     parametrs->sizeFileFlag->isEnable = false;
     parametrs->sizeFileFlag->isMore = true;
+ 
     parametrs->timeFileFlag = malloc(sizeof(timeFlag));
     parametrs->timeFileFlag->time = 0;
     parametrs->timeFileFlag->isEnable = false;
     parametrs->timeFileFlag->isMore = false;
+ 
     parametrs->emptyFlag = false;
 
     return parametrs;
 }
 
-Parametrs* parametrsHandler(Parametrs *para) {
+WINDOW* createParametrsWindow() {
+    
+    WINDOW* win;
+    int windowHeight;
+    int windowWidth;
 
+    getmaxyx(stdscr, windowHeight, windowWidth);
+
+    win = newwin(windowHeight - 1, windowWidth, 0, 0);
+
+    return win;
+}
+
+WINDOW* createParametrsWriteValueWindow() {
+    WINDOW* win = newwin(search_win_height, COLS - 2, 8, 1);
+    keypad(win, TRUE);
+
+    return win;
+}
+
+Parametrs* parametrsHandler(Parametrs *param) {
+
+    win = createParametrsWindow();
     renderParametrsWindow(&win, selectedparametrIndex);
 
-    writeWin = newwin(search_win_height, COLS - 2, 8, 1);
-    keypad(writeWin, TRUE);
+    writeWin = createParametrsWriteValueWindow();
     
-    parametrs = para;
-    
-    updateIsTurn();
-
+    parametrs = param;
     printIsTurnParametr();
     
     while (true) {

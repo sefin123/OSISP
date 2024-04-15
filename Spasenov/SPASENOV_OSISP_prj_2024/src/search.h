@@ -4,14 +4,7 @@
 
 #define PATH_MAX 257
 
-extern int scandir (const char *__restrict __dir,
-		    struct dirent ***__restrict __namelist,
-		    int (*__selector) (const struct dirent *),
-		    int (*__cmp) (const struct dirent **,
-				  const struct dirent **))
-     __nonnull ((1, 2));
-
-     int lstat(const char *path, struct stat *buf);
+int lstat(const char *path, struct stat *buf);
 
 int compareFilenames(const void *a, const void *b);
 
@@ -25,7 +18,7 @@ void processTimeFlag(const char *filePath, const char *input,
                      const char *results[], int *numResults, Parametrs *param);
 
 void processEntry(const char *fullPath, const char *input,
-                  const char *results[], int *numResults, Parametrs *parametr);
+                  const char *results[], int *numResults, Parametrs *param);
 
 void processEmptyFile(const char *fullPath, const char *input,
                       const char *results[], int *numResults);
