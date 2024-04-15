@@ -1,8 +1,10 @@
 #include "gui.h"
 
 void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition) {
+    
     werase(*win);
     box(*win, 0, 0);
+
     for (int i = 0; i < (int)strlen(result); i++) {
         if (i == cursorPosition) {
             wattron(*win, A_STANDOUT);
@@ -12,13 +14,13 @@ void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition) {
             wattroff(*win, A_STANDOUT);
         }
     }
+
     if (cursorPosition == (int)strlen(result)) {
         wattron(*win, A_STANDOUT);
         mvwprintw(*win, 1, strlen(result) + 1, " ");
         wattroff(*win, A_STANDOUT);
     }
 
-    wmove(*win, 1, 1 + cursorPosition);
     wrefresh(*win);
 }
 
@@ -52,10 +54,11 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
 }
 
 void renderHistoryWindow(WINDOW** win) {
+
     int windowHeight, windowWidth;
     getmaxyx(stdscr, windowHeight, windowWidth);
     *win = newwin(windowHeight - 1, windowWidth, 0, 0);
-    box(*win, 0, 0);
+
     keypad(*win, TRUE);
     wclear(*win);
     box(*win, 0, 0);
@@ -63,10 +66,10 @@ void renderHistoryWindow(WINDOW** win) {
     mvwprintw(*win, 1, 1, "History:");
 
     touchwin(stdscr);
-
 }
 
 void renderAboutWindow(WINDOW **win) {
+
     int windowHeight, windowWidth;
     getmaxyx(stdscr, windowHeight, windowWidth);
 
@@ -76,18 +79,20 @@ void renderAboutWindow(WINDOW **win) {
     wclear(*win);
     box(*win, 0, 0);
 
-    int textLength = strlen(ABOUT_PROGRAMM);
-    int positionX = (windowWidth - textLength) / 2;
     int positionY = windowHeight / 2;
 
-    mvwprintw(*win, positionY, positionX, ABOUT_PROGRAMM);
+    mvwprintw(*win, 1, 1, ABOUT_PROGRAMM);
+    mvwprintw(*win, 2, 1, ABOUT_F1_WINDOW);
+    mvwprintw(*win, 3, 1, ABOUT_F2_WINDOW);
+    mvwprintw(*win, 4, 1, ABOUT_HITS_MOVEMENT_UP_DOWN);
+    mvwprintw(*win, 5, 1, ABOUT_HITS_MOVEMENT_RIGHT_LEFT);
     wrefresh(*win);
 
     touchwin(stdscr);
 }
 
-void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int selectedIndex) {
-    
+void renderResultsWindow(WINDOW *win, const char *results[], int numResults,
+                         int selectedIndex) {
     int visibleRows = results_win_height - 2;
     int scrollOffset = 0;
 
@@ -119,6 +124,7 @@ void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int
 }
 
 mainWindow* renderMainWindow() {
+
     mainWindow *window = malloc(sizeof(mainWindow));
 
     WINDOW *searchWin = newwin(search_win_height, COLS - 2, 0, 1);

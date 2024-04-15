@@ -13,16 +13,40 @@ typedef struct timeFlag{
 }timeFlag;
 
 typedef struct Parametrs {
-    bool fileFlag;                  // Поиск простых файлов (1 - включено, 0 - выключено)
-    bool directoryFlag;            // Поиск каталогов (1 - включено, 0 - выключено)
-    bool symlinkFlag;               // Поиск символических ссылок (1 - включено, 0 - выключено)
-    sizeFlag* sizeFileFlag;               // Размер файла для фильтрации (-1 - отключено)
-    timeFlag* timeFileFlag;               // Время изменения файла для фильтрации (-1 - отключено)
-    bool emptyFlag;                  // Пустой ли (1 - включено, 0 - выключено)
+    bool fileFlag;
+    bool directoryFlag;
+    bool symlinkFlag;
+    sizeFlag* sizeFileFlag;
+    timeFlag* timeFileFlag;
+    bool emptyFlag;
 } Parametrs;
 
 #define numParametrs 7
 
-Parametrs* parametrsHandler(Parametrs *para);
+void keyUpParametrsHandler();
+
+void keyDownParametrsHandler();
+
+long convertToLong();
+
+time_t convertToTime();
+
+void printIsTurnParametr();
+
+bool turnFlag(bool flag);
+
+void updateIsTurn();
+
+void keyEnterParametrsHandler() ;
+
+char* writeValueParamtrs(char* input);
+
+void keyRightParametrsHandler();
 
 Parametrs* allocateMemory();
+
+WINDOW* createParametrsWindow();
+
+WINDOW* createParametrsWriteValueWindow();
+
+Parametrs* parametrsHandler(Parametrs *param);

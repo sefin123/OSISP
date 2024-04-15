@@ -1,7 +1,6 @@
 #include "about.h"
 
 void aboutHandler() {
-    
     WINDOW *win;
     renderAboutWindow(&win);
 

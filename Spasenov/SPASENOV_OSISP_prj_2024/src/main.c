@@ -1,7 +1,7 @@
 #include "search.h"
 
 int main() {
-
+    
     initscr();
     cbreak();
     noecho();

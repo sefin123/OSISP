@@ -13,7 +13,8 @@ int compareFilenames(const void *a, const void *b) {
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
-void saveResult(const char *fullPath, const char *input, const char *results[], int *numResults) {
+void saveResult(const char *fullPath, const char *input, const char *results[],
+                 int *numResults) {
     if (strstr(fullPath, input) != NULL) {
         for (int i = 0; i < *numResults; i++) {
             if (strcmp(results[i], fullPath) == 0) {
@@ -98,7 +99,8 @@ void processEmptyFile(const char *fullPath, const char *input, const char *resul
     
 }
 
-void saveDirectory(const char *path, const char *input, const char *results[], int *numResults) {
+void saveDirectory(const char *path, const char *input, const char *results[],
+                     int *numResults) {
     DIR *dir;
     struct dirent *entry;
 
@@ -155,7 +157,7 @@ int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input,
 
 void writePath(const char* path) {
 
-    FILE *file = fopen("History.txt", "a");
+    FILE *file = fopen("/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt", "a");
     if (file == NULL) {
         return;
     }

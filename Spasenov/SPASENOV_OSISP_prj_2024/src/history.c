@@ -19,10 +19,12 @@ void keyDownHistoryHandler() {
 }
 
 int printHistory(WINDOW* win, char *result[]) {
-    FILE* file = fopen("History.txt", "r+");
+
+    FILE* file = fopen("/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt", "r+");
     int numHistoryResults = 0;
     char str[MAX_LENGTH];
     int i = 0;
+    
     while (fgets(str, MAX_LENGTH, file) != NULL) {
         if (str[strlen(str) - 1] == '\n') {
             str[strlen(str) - 1] = '\0';
@@ -51,7 +53,8 @@ char* keyEnterHistoryHandler() {
 }
 
 void deletePathFromHistory() {
-    FILE* file = fopen("History.txt" ,"w");
+
+    FILE* file = fopen("/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt" ,"w");
 
     numHistoryResults--;
     if (selectedHistoryIndex < numHistoryResults) {
@@ -73,7 +76,7 @@ void keyBackspaseHistoryHandler() {
 }
 
 char* historyHandler() {
-
+    
     WINDOW* win;
     renderHistoryWindow(&win);
 

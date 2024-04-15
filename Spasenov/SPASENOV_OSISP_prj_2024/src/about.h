@@ -1,3 +1,3 @@
 #include "gui.h"
 
-void aboutHandler();
+void aboutHandler();    

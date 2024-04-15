@@ -44,7 +44,7 @@ long convertToLong() {
     } else if (*endPtr == 'b') {
         return labs(size);
     } else {
-        return -1;                   // Возвращаем ошибку или другое значение по вашему усмотрению
+        return -1;
     }
 
     return size;
@@ -188,7 +188,7 @@ char* writeValueParamtrs(char* input) {
 }
 
 void keyRightParametrsHandler() {
-
+    
     updateIsTurn();
     
     if (selectedparametrIndex == 4) {
@@ -209,7 +209,7 @@ void keyRightParametrsHandler() {
 }
 
 Parametrs* allocateMemory() {
-    
+
     Parametrs *parametrs = malloc(sizeof(Parametrs));
 
     parametrs->fileFlag = true;
