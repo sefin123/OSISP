@@ -5,12 +5,8 @@ WINDOW* win;
 WINDOW* writeWin;
 bool isTurnFlags[5] = {true, true, true, false , false};
 int selectedparametrIndex = 1;
-bool isSizeFileFlagFocused = false;
-bool isTimeFileFlagFocused = false;
 char sizeFlagInput[MAX_LENGTH] = "";
-int sizeFlagInputLength = 0;
 char timeFlagInput[MAX_LENGTH] = "";
-int timeFlagInputLength = 0;
 int inputLengthParametrsValue = 0;
 int cursorPositionParametrsValue = 0;
 

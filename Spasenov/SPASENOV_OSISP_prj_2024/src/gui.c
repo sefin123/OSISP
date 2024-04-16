@@ -53,9 +53,9 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
     touchwin(stdscr);
 }
 
-void renderHistoryWindow(WINDOW** win) {
+void renderHistoryWindow(WINDOW** win, char* result[], int numResult, int selectedIndex) {
 
-    int windowHeight, windowWidth;
+    int windowHeight, windowWidth, scrollOffset = 0;
     getmaxyx(stdscr, windowHeight, windowWidth);
     *win = newwin(windowHeight - 1, windowWidth, 0, 0);
 
@@ -63,9 +63,28 @@ void renderHistoryWindow(WINDOW** win) {
     wclear(*win);
     box(*win, 0, 0);
 
+    int visibleRows = windowHeight - 5;
+    
+    if (selectedIndex >= visibleRows) {
+        scrollOffset = selectedIndex - visibleRows + 1;
+    }
+
     mvwprintw(*win, 1, 1, "History:");
 
+    for(int i = 0; i < visibleRows && i + scrollOffset < numResult; i++) {
+        int resultIndex = i + scrollOffset;
+
+        if(resultIndex == selectedIndex) {
+            wattron(*win, A_STANDOUT);
+            mvwprintw(*win, i + 3, 1, "%s", result[resultIndex]);
+            wattroff(*win, A_STANDOUT);
+        } else {
+            mvwprintw(*win, i + 3, 1, "%s", result[resultIndex]);
+        }
+    }
+
     touchwin(stdscr);
+    wrefresh(*win);
 }
 
 void renderAboutWindow(WINDOW **win) {
@@ -79,20 +98,19 @@ void renderAboutWindow(WINDOW **win) {
     wclear(*win);
     box(*win, 0, 0);
 
-    int positionY = windowHeight / 2;
-
     mvwprintw(*win, 1, 1, ABOUT_PROGRAMM);
     mvwprintw(*win, 2, 1, ABOUT_F1_WINDOW);
-    mvwprintw(*win, 3, 1, ABOUT_F2_WINDOW);
-    mvwprintw(*win, 4, 1, ABOUT_HITS_MOVEMENT_UP_DOWN);
-    mvwprintw(*win, 5, 1, ABOUT_HITS_MOVEMENT_RIGHT_LEFT);
+    mvwprintw(*win, 3, 1, ABOUT_PARAMETRS);
+    mvwprintw(*win, 4, 1, ABOUT_F2_WINDOW);
+    mvwprintw(*win, 5, 1, ABOUT_HISTORY);
+    mvwprintw(*win, 6, 1, ABOUT_HITS_MOVEMENT_UP_DOWN);
+    mvwprintw(*win, 7, 1, ABOUT_HITS_MOVEMENT_RIGHT_LEFT);
     wrefresh(*win);
 
     touchwin(stdscr);
 }
 
-void renderResultsWindow(WINDOW *win, const char *results[], int numResults,
-                         int selectedIndex) {
+void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int selectedIndex) {
     int visibleRows = results_win_height - 2;
     int scrollOffset = 0;
 

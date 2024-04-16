@@ -8,7 +8,7 @@ void deletePathFromHistory();
 
 char* keyEnterHistoryHandler();
 
-int printHistory(WINDOW* win, char *result[]);
+int printHistory();
 
 void keyDownHistoryHandler();
 

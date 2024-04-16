@@ -18,10 +18,10 @@ void keyDownHistoryHandler() {
     }
 }
 
-int printHistory(WINDOW* win, char *result[]) {
+int printHistory() {
 
     FILE* file = fopen("/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt", "r+");
-    int numHistoryResults = 0;
+    numHistoryResults = 0;
     char str[MAX_LENGTH];
     int i = 0;
     
@@ -33,17 +33,9 @@ int printHistory(WINDOW* win, char *result[]) {
         strcpy(res, str);
         result[numHistoryResults++] = res;
 
-        if(i == selectedHistoryIndex) {
-            wattron(win, A_STANDOUT);
-            mvwprintw(win, i + 3, 1, "%s", result[i]);
-            wattroff(win, A_STANDOUT);
-        } else {
-            mvwprintw(win, i + 3, 1, "%s", result[i]);
-        }
-
         i++;
     }
-    
+
     fclose(file);
     return numHistoryResults;
 }
@@ -78,9 +70,9 @@ void keyBackspaseHistoryHandler() {
 char* historyHandler() {
     
     WINDOW* win;
-    renderHistoryWindow(&win);
+    numHistoryResults = printHistory();
+    renderHistoryWindow(&win, result, numHistoryResults, selectedHistoryIndex);
 
-    numHistoryResults = printHistory(win, result);
     while (true) {
         int ch = wgetch(win);
         
@@ -99,8 +91,8 @@ char* historyHandler() {
             if (ch == KEY_BACKSPACE) {
                 keyBackspaseHistoryHandler();
             }
-        renderHistoryWindow(&win);
-        numHistoryResults = printHistory(win, result);  
+        renderHistoryWindow(&win, result, numHistoryResults, selectedHistoryIndex);
+        numHistoryResults = printHistory();  
     }
     delwin(win);
     endwin();
