@@ -9,7 +9,9 @@ void aboutHandler() {
         if (ch == KEY_F(4)) {
             return;
         }
+        renderAboutWindow(&win);
     }
+    werase(win);
     delwin(win);
     endwin();
 }

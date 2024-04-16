@@ -31,8 +31,7 @@ typedef struct mainWindow {
     WINDOW *resultWin;
 } mainWindow;
 
-void renderResultsWindow(WINDOW *win, const char *results[],
-                         int numResults, int selectedIndex);
+void renderResultsWindow(WINDOW **win, const char *results[], int numResults, int selectedIndex);
 
 mainWindow* renderMainWindow();
 
@@ -42,7 +41,6 @@ void renderParametrsWindow(WINDOW **win, int selectedIndex);
 
 void renderHistoryWindow(WINDOW **win, char* result[], int numResult, int selectedIndex);
 
-void renderWriteWindow(WINDOW **win, const char *result,
-                       int cursorPosition);
+void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition);
 
 #endif

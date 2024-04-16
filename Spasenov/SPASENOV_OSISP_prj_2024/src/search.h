@@ -26,18 +26,17 @@ void processEmptyFile(const char *fullPath, const char *input,
 void saveDirectory(const char *path, const char *input,
                    const char *results[], int *numResults);
 
-int printDirectory(WINDOW *searchWin, WINDOW *resultsWin,
-                   const char *input, const char *path,
+int printDirectory(const char *input, const char *path,
                    const char *results[], int selectedIndex,
                    int cousorPosition);
 
 void writePath(const char* path);
 
-void keyDownHandler(WINDOW* win);
+void keyDownHandler();
 
 void keyBackspaseHandler();
 
-void keyUpHandler(WINDOW* win);
+void keyUpHandler();
 
 void keyRightHandler();
 
@@ -53,4 +52,4 @@ void keyF1Handler();
 
 void writeHandler(int ch);
 
-void handleInput(WINDOW *searchWin, WINDOW *resultsWin);
+void handleInput();

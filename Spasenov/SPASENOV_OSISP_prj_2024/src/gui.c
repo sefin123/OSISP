@@ -1,7 +1,19 @@
 #include "gui.h"
 
+void printNavigation(WINDOW** win, int windowHeight) {
+    int windowWidth;
+    windowWidth = getmaxx(stdscr);
+    int x = (windowWidth - strlen(NAVIGATION)) / 2; 
+    mvwprintw(*win, windowHeight, x, NAVIGATION);
+}
+
 void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition) {
-    
+
+    int windowWidth;
+    windowWidth = getmaxx(stdscr);
+
+    *win = newwin(search_win_height, windowWidth , 0, 0);
+    keypad(*win, TRUE);
     werase(*win);
     box(*win, 0, 0);
 
@@ -34,7 +46,11 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
         "Search by time modify(s,m,h)",
         "Search empty files"
     };
-    
+
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
+
+    *win = newwin(windowHeight, windowWidth, 0, 0);
     keypad(*win, TRUE);
     wclear(*win);
     box(*win, 0, 0);
@@ -50,15 +66,18 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
         }
     }
     
+    printNavigation(win, windowHeight - 2);
+
     touchwin(stdscr);
+    wrefresh(*win);
 }
 
 void renderHistoryWindow(WINDOW** win, char* result[], int numResult, int selectedIndex) {
 
     int windowHeight, windowWidth, scrollOffset = 0;
     getmaxyx(stdscr, windowHeight, windowWidth);
-    *win = newwin(windowHeight - 1, windowWidth, 0, 0);
 
+    *win = newwin(windowHeight, windowWidth, 0, 0);
     keypad(*win, TRUE);
     wclear(*win);
     box(*win, 0, 0);
@@ -83,6 +102,8 @@ void renderHistoryWindow(WINDOW** win, char* result[], int numResult, int select
         }
     }
 
+    printNavigation(win, windowHeight - 2);
+
     touchwin(stdscr);
     wrefresh(*win);
 }
@@ -92,8 +113,7 @@ void renderAboutWindow(WINDOW **win) {
     int windowHeight, windowWidth;
     getmaxyx(stdscr, windowHeight, windowWidth);
 
-    *win = newwin(windowHeight - 1, windowWidth, 0, 0);
-    box(*win, 0, 0);
+    *win = newwin(windowHeight, windowWidth, 0, 0);
     keypad(*win, TRUE);
     wclear(*win);
     box(*win, 0, 0);
@@ -105,17 +125,23 @@ void renderAboutWindow(WINDOW **win) {
     mvwprintw(*win, 5, 1, ABOUT_HISTORY);
     mvwprintw(*win, 6, 1, ABOUT_HITS_MOVEMENT_UP_DOWN);
     mvwprintw(*win, 7, 1, ABOUT_HITS_MOVEMENT_RIGHT_LEFT);
-    wrefresh(*win);
+    
+    printNavigation(win, windowHeight - 2);
 
     touchwin(stdscr);
+    wrefresh(*win);
 }
 
-void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int selectedIndex) {
+void renderResultsWindow(WINDOW **win, const char *results[], int numResults, int selectedIndex) {
     int visibleRows = results_win_height - 2;
     int scrollOffset = 0;
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
 
-    werase(win);
-    box(win, 0, 0);
+    *win = newwin(windowHeight - search_win_height, windowWidth, search_win_height, 0);
+    keypad(*win, TRUE);
+    werase(*win);
+    box(*win, 0, 0);
 
     if (selectedIndex >= visibleRows) {
         scrollOffset = selectedIndex - visibleRows + 1;
@@ -125,37 +151,16 @@ void renderResultsWindow(WINDOW *win, const char *results[], int numResults, int
         int resultIndex = i + scrollOffset;
 
         if (resultIndex == selectedIndex) {
-            wattron(win, A_STANDOUT);
+            wattron(*win, A_STANDOUT);
         }
-        mvwprintw(win, i + 1, 1, "%s", results[resultIndex]);
+        mvwprintw(*win, i + 1, 1, "%s", results[resultIndex]);
         if (resultIndex == selectedIndex) {
-            wattroff(win, A_STANDOUT);
+            wattroff(*win, A_STANDOUT);
         }
     }
 
-    int terminalWidth = getmaxx(stdscr);
-    int x = (terminalWidth - strlen(NAVIGATION)) / 2; 
-    mvprintw(LINES - 1, x, NAVIGATION);
+    printNavigation(win, windowHeight - 5);
 
     refresh();
-    wrefresh(win);
-}
-
-mainWindow* renderMainWindow() {
-
-    mainWindow *window = malloc(sizeof(mainWindow));
-
-    WINDOW *searchWin = newwin(search_win_height, COLS - 2, 0, 1);
-    WINDOW *resultWin = newwin(results_win_height, COLS - 2, search_win_height + 1, 1);
-
-    refresh();
-    wrefresh(searchWin);
-    wrefresh(resultWin);
-
-    keypad(searchWin, TRUE);
-    
-    window->resultWin = resultWin;
-    window->searchWin = searchWin;
-
-    return window;
+    wrefresh(*win);
 }

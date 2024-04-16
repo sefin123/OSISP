@@ -227,19 +227,6 @@ Parametrs* allocateMemory() {
     return parametrs;
 }
 
-WINDOW* createParametrsWindow() {
-    
-    WINDOW* win;
-    int windowHeight;
-    int windowWidth;
-
-    getmaxyx(stdscr, windowHeight, windowWidth);
-
-    win = newwin(windowHeight - 1, windowWidth, 0, 0);
-
-    return win;
-}
-
 WINDOW* createParametrsWriteValueWindow() {
     WINDOW* win = newwin(search_win_height, COLS - 2, 8, 1);
     keypad(win, TRUE);
@@ -249,7 +236,6 @@ WINDOW* createParametrsWriteValueWindow() {
 
 Parametrs* parametrsHandler(Parametrs *param) {
 
-    win = createParametrsWindow();
     renderParametrsWindow(&win, selectedparametrIndex);
 
     writeWin = createParametrsWriteValueWindow();

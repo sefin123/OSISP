@@ -1,6 +1,8 @@
 #include "search.h"
 
 Parametrs* param;
+WINDOW* resultsWin;
+WINDOW* searchWin;
 char input[MAX_LENGTH] = "";
 int inputLength = 0;
 int selectedIndex = 0;
@@ -140,9 +142,7 @@ void saveDirectory(const char *path, const char *input, const char *results[],
     closedir(dir);
 }
 
-int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input,
-                    const char *path, const char *results[], int selectedIndex,
-                     int cousorPosition) {
+int printDirectory(const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition) {
 
     int numResults = 0;
     saveDirectory(path, input, results, &numResults);
@@ -150,7 +150,7 @@ int printDirectory(WINDOW *searchWin, WINDOW *resultsWin, const char *input,
     qsort(results, numResults, sizeof(const char *), compareFilenames);
 
     renderWriteWindow(&searchWin, input, cousorPosition);
-    renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+    renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
     
     return numResults;
 }
@@ -168,18 +168,18 @@ void writePath(const char* path) {
     refresh();
 }
 
-void keyDownHandler(WINDOW* win) {
+void keyDownHandler() {
     if (selectedIndex < numResults - 1) {
         selectedIndex++;
-        renderResultsWindow(win, results, numResults, selectedIndex);
+        renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
     }
 }
 
-void keyUpHandler(WINDOW* win) {
+void keyUpHandler() {
     if (selectedIndex > 0) {
         if (selectedIndex > numResults) selectedIndex = numResults;
         selectedIndex--;
-        renderResultsWindow(win, results, numResults, selectedIndex);
+        renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
     }
 }
 
@@ -240,13 +240,13 @@ void writeHandler(int ch) {
     }
 }
 
-void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
+void handleInput() {
     
+    renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
+
     param = allocateMemory();
 
-    numResults = printDirectory(searchWin, resultsWin, input,
-                                path, results, 0,
-                                cursorPosition);
+    numResults = printDirectory(input, path, results, 0, cursorPosition);
 
     while (true) {
 
@@ -259,11 +259,11 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             break;
             }
             case KEY_DOWN: {
-                keyDownHandler(resultsWin);
+                keyDownHandler();
             break;
             }
             case KEY_UP: {
-                keyUpHandler(resultsWin);
+                keyUpHandler();
             break;
             }
             case KEY_LEFT: {
@@ -280,7 +280,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             }
             case KEY_F(3): {
                 keyF3Handler();
-                renderResultsWindow(resultsWin, results,
+                renderResultsWindow(&resultsWin, results,
                                     numResults, selectedIndex);
                 renderWriteWindow(&searchWin, input,
                                   cursorPosition);
@@ -292,7 +292,7 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             }
             case KEY_F(1): {
                 keyF1Handler();
-                renderResultsWindow(resultsWin, results,
+                renderResultsWindow(&resultsWin, results,
                                     numResults, selectedIndex);
 
                 renderWriteWindow(&searchWin, input,
@@ -304,10 +304,10 @@ void handleInput(WINDOW *searchWin, WINDOW *resultsWin) {
             break;
             }
         }
-        renderResultsWindow(resultsWin, results, numResults, selectedIndex);
+        renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
         renderWriteWindow(&searchWin, input, cursorPosition);
-        numResults = printDirectory(searchWin, resultsWin, input,
-                                    path, results, selectedIndex,
-                                    cursorPosition);
+        numResults = printDirectory(input, path, results, selectedIndex, cursorPosition);
     }
+    delwin(searchWin);
+    delwin(resultsWin);
 }
