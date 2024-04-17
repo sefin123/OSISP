@@ -13,3 +13,5 @@ int printHistory();
 void keyDownHistoryHandler();
 
 void keyUpHistoryHandler();
+
+WINDOW* createHistoryWindow();

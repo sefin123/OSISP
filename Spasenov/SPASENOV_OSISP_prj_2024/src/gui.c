@@ -12,7 +12,7 @@ void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition) {
     int windowWidth;
     windowWidth = getmaxx(stdscr);
 
-    *win = newwin(search_win_height, windowWidth, 0, 0);
+    wresize(*win,search_win_height, windowWidth);
     keypad(*win, TRUE);
     werase(*win);
     box(*win, 0, 0);
@@ -50,8 +50,7 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
     int windowHeight, windowWidth;
     getmaxyx(stdscr, windowHeight, windowWidth);
 
-    *win = newwin(windowHeight, windowWidth, 0, 0);
-    keypad(*win, TRUE);
+    wresize(*win,windowHeight, windowWidth);
     wclear(*win);
     box(*win, 0, 0);
 
@@ -77,8 +76,7 @@ void renderHistoryWindow(WINDOW** win, char* result[], int numResult, int select
     int windowHeight, windowWidth, scrollOffset = 0;
     getmaxyx(stdscr, windowHeight, windowWidth);
 
-    *win = newwin(windowHeight, windowWidth, 0, 0);
-    keypad(*win, TRUE);
+    wresize(*win,windowHeight, windowWidth);
     wclear(*win);
     box(*win, 0, 0);
 
@@ -113,8 +111,7 @@ void renderAboutWindow(WINDOW **win) {
     int windowHeight, windowWidth;
     getmaxyx(stdscr, windowHeight, windowWidth);
 
-    *win = newwin(windowHeight, windowWidth, 0, 0);
-    keypad(*win, TRUE);
+    wresize(*win, windowHeight, windowWidth);
     wclear(*win);
     box(*win, 0, 0);
 
@@ -139,7 +136,7 @@ void renderResultsWindow(WINDOW **win, const char *results[], int numResults, in
     getmaxyx(stdscr, windowHeight, windowWidth);
     int visibleRows = windowHeight - search_win_height - 3;
 
-    *win = newwin(windowHeight - search_win_height, windowWidth, search_win_height, 0);
+    wresize(*win, windowHeight - search_win_height, windowWidth);
     keypad(*win, TRUE);
     werase(*win);
     box(*win, 0, 0);

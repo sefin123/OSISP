@@ -1,7 +1,7 @@
 #include "parametrs.h"
 
 Parametrs* parametrs;
-WINDOW* win;
+WINDOW* parametrsWin;
 WINDOW* writeWin;
 bool isTurnFlags[5] = {true, true, true, false , false};
 int selectedparametrIndex = 1;
@@ -69,23 +69,23 @@ time_t convertToTime() {
 void printIsTurnParametr() {
     for (int i = 1; i < numParametrs; i++) {
         if (isTurnFlags[i - 1]) {
-            mvwprintw(win, i + 1, 35, "Enable");
+            mvwprintw(parametrsWin, i + 1, 35, "Enable");
         } else {
-            mvwprintw(win, i + 1, 35, "Disable");
+            mvwprintw(parametrsWin, i + 1, 35, "Disable");
         }
     }
     if (isTurnFlags[3]) {
         if (parametrs->sizeFileFlag->size == -1) {
-            mvwprintw(win, 5, 45, "Invalid value");
+            mvwprintw(parametrsWin, 5, 45, "Invalid value");
         } else {
-            mvwprintw(win, 5, 45, "%s", sizeFlagInput);
+            mvwprintw(parametrsWin, 5, 45, "%s", sizeFlagInput);
         }
     }
     if (isTurnFlags[4]) {
         if (parametrs->timeFileFlag->time == -1) {
-            mvwprintw(win, 6, 45, "Invalid value");
+            mvwprintw(parametrsWin, 6, 45, "Invalid value");
         } else {
-            mvwprintw(win, 6, 45, "%s", timeFlagInput);
+            mvwprintw(parametrsWin, 6, 45, "%s", timeFlagInput);
         }
     }
 }
@@ -136,7 +136,7 @@ char* writeValueParamtrs(char* input) {
     cursorPositionParametrsValue = (int)strlen(input);
 
     while(true) {
-        int ch = wgetch(win);
+        int ch = wgetch(parametrsWin);
         switch (ch) {
             case KEY_F(4): {
                 return "";
@@ -234,9 +234,19 @@ WINDOW* createParametrsWriteValueWindow() {
     return win;
 }
 
+WINDOW* createParametrsWindow() {
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
+    WINDOW* win = newwin(windowHeight, windowWidth, 0, 0);
+    keypad(win, TRUE);
+
+    return win;
+}
+
 Parametrs* parametrsHandler(Parametrs *param) {
 
-    renderParametrsWindow(&win, selectedparametrIndex);
+    parametrsWin = createParametrsWindow();
+    renderParametrsWindow(&parametrsWin, selectedparametrIndex);
 
     writeWin = createParametrsWriteValueWindow();
     
@@ -244,7 +254,7 @@ Parametrs* parametrsHandler(Parametrs *param) {
     printIsTurnParametr();
     
     while (true) {
-        int ch = wgetch(win);
+        int ch = wgetch(parametrsWin);
         if (ch == KEY_F(4)) {
             return parametrs;
         }
@@ -260,9 +270,9 @@ Parametrs* parametrsHandler(Parametrs *param) {
         if (ch == KEY_RIGHT) {
             keyRightParametrsHandler();
         }
-        renderParametrsWindow(&win, selectedparametrIndex);
+        renderParametrsWindow(&parametrsWin, selectedparametrIndex);
         printIsTurnParametr();
     }
-    delwin(win);
+    delwin(parametrsWin);
     endwin();
 }

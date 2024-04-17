@@ -240,7 +240,29 @@ void writeHandler(int ch) {
     }
 }
 
+WINDOW* createSearchWindow() {
+    int windowWidth;
+    windowWidth = getmaxx(stdscr);
+    WINDOW* win = newwin(search_win_height, windowWidth, 0, 0);
+    keypad(win, TRUE);
+
+    return win;
+}
+
+WINDOW* createResultsWindow() {
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
+
+    WINDOW* win = newwin(windowHeight - search_win_height, windowWidth, search_win_height, 0);
+    keypad(win, TRUE);
+
+    return win;
+}
+
 void handleInput() {
+
+    searchWin = createSearchWindow();
+    resultsWin = createResultsWindow();
     
     renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
 

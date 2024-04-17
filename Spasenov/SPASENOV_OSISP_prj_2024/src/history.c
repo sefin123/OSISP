@@ -67,9 +67,18 @@ void keyBackspaseHistoryHandler() {
     deletePathFromHistory();
 }
 
+WINDOW* createHistoryWindow() {
+    int windowHeight, windowWidth;
+    getmaxyx(stdscr, windowHeight, windowWidth);
+    WINDOW *win = newwin(windowHeight, windowWidth, 0, 0);
+    keypad(win, TRUE);
+    
+    return win;
+}
+
 char* historyHandler() {
     
-    WINDOW* win;
+    WINDOW* win = createHistoryWindow();
     numHistoryResults = printHistory();
     renderHistoryWindow(&win, result, numHistoryResults, selectedHistoryIndex);
 
