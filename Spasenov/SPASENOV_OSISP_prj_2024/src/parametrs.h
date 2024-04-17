@@ -37,9 +37,7 @@ bool turnFlag(bool flag);
 
 void updateIsTurn();
 
-void keyEnterParametrsHandler() ;
-
-char* writeValueParamtrs(char* input);
+void keyEnterParametrsHandler();
 
 void keyRightParametrsHandler();
 

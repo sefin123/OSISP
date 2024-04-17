@@ -2,7 +2,7 @@
 #include "about.h"
 #include "history.h"
 
-#define PATH_MAX 512
+#define PATH_MAX 2048
 
 int lstat(const char *path, struct stat *buf);
 

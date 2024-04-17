@@ -12,7 +12,7 @@ void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition) {
     int windowWidth;
     windowWidth = getmaxx(stdscr);
 
-    *win = newwin(search_win_height, windowWidth , 0, 0);
+    *win = newwin(search_win_height, windowWidth, 0, 0);
     keypad(*win, TRUE);
     werase(*win);
     box(*win, 0, 0);
@@ -123,8 +123,9 @@ void renderAboutWindow(WINDOW **win) {
     mvwprintw(*win, 3, 1, ABOUT_PARAMETRS);
     mvwprintw(*win, 4, 1, ABOUT_F2_WINDOW);
     mvwprintw(*win, 5, 1, ABOUT_HISTORY);
-    mvwprintw(*win, 6, 1, ABOUT_HITS_MOVEMENT_UP_DOWN);
-    mvwprintw(*win, 7, 1, ABOUT_HITS_MOVEMENT_RIGHT_LEFT);
+    mvwprintw(*win, 6, 1, ABOUT_MOVEMENT_UP_DOWN);
+    mvwprintw(*win, 7, 1, ABOUT_MOVEMENT_RIGHT_LEFT);
+    mvwprintw(*win, 8, 1, ABOUT_BACK_EXIT);
     
     printNavigation(win, windowHeight - 2);
 
@@ -133,10 +134,10 @@ void renderAboutWindow(WINDOW **win) {
 }
 
 void renderResultsWindow(WINDOW **win, const char *results[], int numResults, int selectedIndex) {
-    int visibleRows = results_win_height - 2;
     int scrollOffset = 0;
     int windowHeight, windowWidth;
     getmaxyx(stdscr, windowHeight, windowWidth);
+    int visibleRows = windowHeight - search_win_height - 3;
 
     *win = newwin(windowHeight - search_win_height, windowWidth, search_win_height, 0);
     keypad(*win, TRUE);
@@ -159,7 +160,7 @@ void renderResultsWindow(WINDOW **win, const char *results[], int numResults, in
         }
     }
 
-    printNavigation(win, windowHeight - 5);
+    printNavigation(win, windowHeight - search_win_height - 2);
 
     refresh();
     wrefresh(*win);

@@ -55,7 +55,7 @@ void processSizeFlag(const char *filePath, const char *input, const char *result
 void processTimeFlag(const char *filePath, const char *input, const char *results[],
                      int *numResults, Parametrs *param) {
     struct stat fileStat;
-    if (stat(filePath, &fileStat) == 0) {
+    if (lstat(filePath, &fileStat) == 0) {
         struct tm *modificationTime = localtime(&fileStat.st_mtime);
 
         if (param->timeFileFlag->isMore && mktime(modificationTime) > param->timeFileFlag->time) {
@@ -72,7 +72,7 @@ void processTimeFlag(const char *filePath, const char *input, const char *result
 void processEntry(const char *fullPath, const char *input, const char *results[],
                   int *numResults, Parametrs *param) {
     struct stat fileStat;
-    if (stat(fullPath, &fileStat) == 0) {
+    if (lstat(fullPath, &fileStat) == 0) {
         if (param->sizeFileFlag->isEnable) {
             processSizeFlag(fullPath, input, results, numResults, param);
         } else if (param->timeFileFlag->isEnable) {
