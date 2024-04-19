@@ -10,19 +10,6 @@ char timeFlagInput[MAX_LENGTH] = "";
 int inputLengthParametrsValue = 0;
 int cursorPositionParametrsValue = 0;
 
-void keyUpParametrsHandler() {
-    if (selectedparametrIndex > 1) {
-        if (selectedparametrIndex > numParametrs) selectedparametrIndex = numParametrs;
-        selectedparametrIndex--;
-    }
-}
-
-void keyDownParametrsHandler() {
-    if (selectedparametrIndex < numParametrs - 1) {
-        selectedparametrIndex++;
-    }
-}
-
 long convertToLong() {
     char* endPtr;
     long size = strtol(sizeFlagInput, &endPtr, 10);
@@ -103,33 +90,6 @@ void updateIsTurn() {
         isTurnFlags[5] = parametrs->emptyFlag ? true : false;
 }
 
-void keyEnterParametrsHandler() {
-    if (selectedparametrIndex == 1) {
-        parametrs->fileFlag = turnFlag(parametrs->fileFlag);
-        isTurnFlags[0] = parametrs->fileFlag ? true : false; 
-    }
-    if (selectedparametrIndex == 2) {
-        parametrs->directoryFlag = turnFlag(parametrs->directoryFlag);
-        isTurnFlags[1] = parametrs->directoryFlag ? true : false;
-    }
-    if (selectedparametrIndex == 3) {
-        parametrs->symlinkFlag = turnFlag(parametrs->symlinkFlag);
-        isTurnFlags[2] = parametrs->symlinkFlag ? true : false;
-    }
-    if (selectedparametrIndex == 4) {
-        parametrs->sizeFileFlag->isEnable = turnFlag(parametrs->sizeFileFlag->isEnable);
-        isTurnFlags[3] = parametrs->sizeFileFlag->isEnable ? true : false;
-    }
-    if (selectedparametrIndex == 5) {
-        parametrs->timeFileFlag->isEnable = turnFlag(parametrs->timeFileFlag->isEnable);
-        isTurnFlags[4] = parametrs->timeFileFlag->isEnable ? true : false;
-    }
-    if (selectedparametrIndex == 6) {
-        parametrs->emptyFlag = turnFlag(parametrs->emptyFlag);
-        isTurnFlags[5] = parametrs->emptyFlag ? true : false;
-    }
-}
-
 char* writeValueParamtrs(char* input) {
 
     inputLengthParametrsValue = (int)strlen(input);
@@ -145,6 +105,9 @@ char* writeValueParamtrs(char* input) {
                 return input;
             }
             case KEY_BACKSPACE: {
+                if (cursorPositionParametrsValue == 0) {
+                    break;
+                }
                 if (inputLengthParametrsValue > 0) {
                     for (int i = cursorPositionParametrsValue; i < inputLengthParametrsValue; i++) {
                         input[i - 1] = input[i];
@@ -180,6 +143,46 @@ char* writeValueParamtrs(char* input) {
             }
         }
         renderWriteWindow(&writeWin, input, cursorPositionParametrsValue);
+    }
+}
+
+void keyEnterParametrsHandler() {
+    if (selectedparametrIndex == 1) {
+        parametrs->fileFlag = turnFlag(parametrs->fileFlag);
+        isTurnFlags[0] = parametrs->fileFlag ? true : false; 
+    }
+    if (selectedparametrIndex == 2) {
+        parametrs->directoryFlag = turnFlag(parametrs->directoryFlag);
+        isTurnFlags[1] = parametrs->directoryFlag ? true : false;
+    }
+    if (selectedparametrIndex == 3) {
+        parametrs->symlinkFlag = turnFlag(parametrs->symlinkFlag);
+        isTurnFlags[2] = parametrs->symlinkFlag ? true : false;
+    }
+    if (selectedparametrIndex == 4) {
+        parametrs->sizeFileFlag->isEnable = turnFlag(parametrs->sizeFileFlag->isEnable);
+        isTurnFlags[3] = parametrs->sizeFileFlag->isEnable ? true : false;
+    }
+    if (selectedparametrIndex == 5) {
+        parametrs->timeFileFlag->isEnable = turnFlag(parametrs->timeFileFlag->isEnable);
+        isTurnFlags[4] = parametrs->timeFileFlag->isEnable ? true : false;
+    }
+    if (selectedparametrIndex == 6) {
+        parametrs->emptyFlag = turnFlag(parametrs->emptyFlag);
+        isTurnFlags[5] = parametrs->emptyFlag ? true : false;
+    }
+}
+
+void keyUpParametrsHandler() {
+    if (selectedparametrIndex > 1) {
+        if (selectedparametrIndex > numParametrs) selectedparametrIndex = numParametrs;
+        selectedparametrIndex--;
+    }
+}
+
+void keyDownParametrsHandler() {
+    if (selectedparametrIndex < numParametrs - 1) {
+        selectedparametrIndex++;
     }
 }
 

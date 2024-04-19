@@ -4,23 +4,22 @@ int numHistoryResults = 0;
 int selectedHistoryIndex = 0;
 char* result[MAX_LENGTH];
 
-void keyUpHistoryHandler() {
-    if (selectedHistoryIndex > 0) {
-        if (selectedHistoryIndex > numHistoryResults) selectedHistoryIndex = numHistoryResults;
-        selectedHistoryIndex--;
-    }
-}
+void writePath(const char* path) {
 
-
-void keyDownHistoryHandler() {
-    if (selectedHistoryIndex < numHistoryResults - 1) {
-        selectedHistoryIndex++;
+    FILE *file = fopen(HISTORY_FILE_PATH, "a");
+    if (file == NULL) {
+        return;
     }
+
+    fprintf(file, "%s\n", path);
+
+    fclose(file);
+    refresh();
 }
 
 int printHistory() {
 
-    FILE* file = fopen("/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt", "r+");
+    FILE* file = fopen(HISTORY_FILE_PATH, "r+");
     numHistoryResults = 0;
     char str[MAX_LENGTH];
     int i = 0;
@@ -44,9 +43,23 @@ char* keyEnterHistoryHandler() {
     return result[selectedHistoryIndex];
 }
 
+void keyUpHistoryHandler() {
+    if (selectedHistoryIndex > 0) {
+        if (selectedHistoryIndex > numHistoryResults) selectedHistoryIndex = numHistoryResults;
+        selectedHistoryIndex--;
+    }
+}
+
+
+void keyDownHistoryHandler() {
+    if (selectedHistoryIndex < numHistoryResults - 1) {
+        selectedHistoryIndex++;
+    }
+}
+
 void deletePathFromHistory() {
 
-    FILE* file = fopen("/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt" ,"w");
+    FILE* file = fopen(HISTORY_FILE_PATH ,"w");
 
     numHistoryResults--;
     if (selectedHistoryIndex < numHistoryResults) {

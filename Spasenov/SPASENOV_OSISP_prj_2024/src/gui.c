@@ -37,14 +37,14 @@ void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition) {
 }
 
 void renderParametrsWindow(WINDOW** win, int selectedIndex) {
-    const char* parameters[] = {
-        "Parametrs for utility find: ",
-        "Search files",
-        "Search directoreis",
-        "Search symbol links",
-        "Search by size(g,m,k,c,w,b)",
-        "Search by time modify(s,m,h)",
-        "Search empty files"
+    const char* parametrs[PARAMETRS_COUNT] = {
+        PARAMETRS_FIND,
+        PARAMETR_SEARCH_FILES,
+        PARAMETR_SEARCH_DIRECTORIES,
+        PARAMETR_SEARCH_SYMBOL_LINKS,
+        PARAMETR_SEARCH_BY_SIZE,
+        PARAMETR_SEARCH_BY_TIME_MODIFY,
+        PARAMETR_SEARCH_EMPTY_FILES
     };
 
     int windowHeight, windowWidth;
@@ -55,11 +55,11 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
     box(*win, 0, 0);
 
 
-    for (int i = 0; i < (int)(sizeof(parameters) / sizeof(parameters[0])); i++) {
+    for (int i = 0; i < PARAMETRS_COUNT; i++) {
         if (i == selectedIndex) {
             wattron(*win, A_STANDOUT);
         }
-        mvwprintw(*win, i + 1, 2, "%s", parameters[i]);
+        mvwprintw(*win, i + 1, 2, "%s", parametrs[i]);
         if (i == selectedIndex) {
             wattroff(*win, A_STANDOUT);
         }
@@ -107,6 +107,16 @@ void renderHistoryWindow(WINDOW** win, char* result[], int numResult, int select
 }
 
 void renderAboutWindow(WINDOW **win) {
+    const char *about[ABOUT_STRINGS_COUNT] = {
+        ABOUT_PROGRAMM,
+        ABOUT_F1_WINDOW,
+        ABOUT_PARAMETRS,
+        ABOUT_F2_WINDOW,
+        ABOUT_HISTORY,
+        ABOUT_MOVEMENT_UP_DOWN,
+        ABOUT_MOVEMENT_LEFT_RIGHT,
+        ABOUT_BACK_EXIT,
+    };
 
     int windowHeight, windowWidth;
     getmaxyx(stdscr, windowHeight, windowWidth);
@@ -115,15 +125,10 @@ void renderAboutWindow(WINDOW **win) {
     wclear(*win);
     box(*win, 0, 0);
 
-    mvwprintw(*win, 1, 1, ABOUT_PROGRAMM);
-    mvwprintw(*win, 2, 1, ABOUT_F1_WINDOW);
-    mvwprintw(*win, 3, 1, ABOUT_PARAMETRS);
-    mvwprintw(*win, 4, 1, ABOUT_F2_WINDOW);
-    mvwprintw(*win, 5, 1, ABOUT_HISTORY);
-    mvwprintw(*win, 6, 1, ABOUT_MOVEMENT_UP_DOWN);
-    mvwprintw(*win, 7, 1, ABOUT_MOVEMENT_RIGHT_LEFT);
-    mvwprintw(*win, 8, 1, ABOUT_BACK_EXIT);
-    
+    for (int i = 0; i < ABOUT_STRINGS_COUNT; i++) {
+        mvwprintw(*win, i + 1, 1, "%s", about[i]);
+    }
+
     printNavigation(win, windowHeight - 2);
 
     touchwin(stdscr);

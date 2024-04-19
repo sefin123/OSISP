@@ -155,19 +155,6 @@ int printDirectory(const char *input, const char *path, const char *results[], i
     return numResults;
 }
 
-void writePath(const char* path) {
-
-    FILE *file = fopen("/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt", "a");
-    if (file == NULL) {
-        return;
-    }
-
-    fprintf(file, "%s\n", path);
-
-    fclose(file);
-    refresh();
-}
-
 void keyDownHandler() {
     if (selectedIndex < numResults - 1) {
         selectedIndex++;
@@ -184,6 +171,9 @@ void keyUpHandler() {
 }
 
 void keyBackspaseHandler() {
+    if (cursorPosition == 0) { 
+        return;
+    }
     if (inputLength > 0) {
         for (int i = cursorPosition; i < inputLength; i++) {
             input[i - 1] = input[i];
@@ -302,10 +292,6 @@ void handleInput() {
             }
             case KEY_F(3): {
                 keyF3Handler();
-                renderResultsWindow(&resultsWin, results,
-                                    numResults, selectedIndex);
-                renderWriteWindow(&searchWin, input,
-                                  cursorPosition);
                 break;   
             }
             case KEY_F(2): {
@@ -314,11 +300,6 @@ void handleInput() {
             }
             case KEY_F(1): {
                 keyF1Handler();
-                renderResultsWindow(&resultsWin, results,
-                                    numResults, selectedIndex);
-
-                renderWriteWindow(&searchWin, input,
-                                  cursorPosition);
                 break;
             }
             default: {
