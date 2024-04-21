@@ -1,12 +1,13 @@
 #include "parametrs.h"
 #include "about.h"
 #include "history.h"
+#include "gui.h"
 
 #define PATH_MAX 2048
 
 int lstat(const char *path, struct stat *buf);
 
-int compareFilenames(const void *a, const void *b);
+int compareFileNames(const void *fileOne, const void *fileTwo);
 
 void saveResult(const char *fullPath, const char *input,
                 const char *results[], int *numResults);
@@ -30,13 +31,11 @@ int printDirectory(const char *input, const char *path,
                    const char *results[], int selectedIndex,
                    int cousorPosition);
 
-void writePath(const char* path);
-
 void keyDownHandler();
 
-void keyBackspaseHandler();
-
 void keyUpHandler();
+
+void keyBackspaseHandler();
 
 void keyRightHandler();
 
@@ -51,5 +50,9 @@ void keyF2Handler();
 void keyF1Handler();
 
 void writeHandler(int ch);
+
+WINDOW* createSearchWindow();
+
+WINDOW* createResultsWindow();
 
 void handleInput();

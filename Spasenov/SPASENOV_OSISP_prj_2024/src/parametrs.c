@@ -90,7 +90,7 @@ void updateIsTurn() {
         isTurnFlags[5] = parametrs->emptyFlag ? true : false;
 }
 
-char* writeValueParamtrs(char* input) {
+char* writeValueParametrs(char* input) {
 
     inputLengthParametrsValue = (int)strlen(input);
     cursorPositionParametrsValue = (int)strlen(input);
@@ -192,7 +192,7 @@ void keyRightParametrsHandler() {
     
     if (selectedparametrIndex == 4) {
         renderWriteWindow(&writeWin, sizeFlagInput, cursorPositionParametrsValue);
-        strcpy(sizeFlagInput, writeValueParamtrs(sizeFlagInput));
+        strcpy(sizeFlagInput, writeValueParametrs(sizeFlagInput));
         parametrs->sizeFileFlag->size = convertToLong();
         parametrs->sizeFileFlag->isMore = (sizeFlagInput[0] == '+') ? true : false;
         printIsTurnParametr();
@@ -200,7 +200,7 @@ void keyRightParametrsHandler() {
 
     if (selectedparametrIndex == 5) {
         renderWriteWindow(&writeWin, timeFlagInput, cursorPositionParametrsValue);
-        strcpy(timeFlagInput, writeValueParamtrs(timeFlagInput));
+        strcpy(timeFlagInput, writeValueParametrs(timeFlagInput));
         parametrs->timeFileFlag->time = convertToTime();
         parametrs->timeFileFlag->isMore = (timeFlagInput[0] == '+') ? true : false;
         printIsTurnParametr();
@@ -231,7 +231,9 @@ Parametrs* allocateMemory() {
 }
 
 WINDOW* createParametrsWriteValueWindow() {
-    WINDOW* win = newwin(search_win_height, COLS - 2, 8, 1);
+    int windowWidth;
+    windowWidth = getmaxx(stdscr);
+    WINDOW* win = newwin(search_win_height, windowWidth, 8, 1);
     keypad(win, TRUE);
 
     return win;

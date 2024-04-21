@@ -41,6 +41,20 @@ void update_stats()
         }
         case 1:
         {
+            stats.first = 0;
+            stats.second = 1;
+            counter++;
+            break;
+        }
+        case 2:
+        {
+            stats.first = 1;
+            stats.second = 0;
+            counter++;
+            break;
+        }
+        case 3:
+        {
             stats.first = 1;
             stats.second = 1;
             counter++;
@@ -107,7 +121,7 @@ void init_signals_handling()
     action.sa_flags = 0;
     action.sa_mask = set;
     action.sa_handler = user_signal_handler;
-
+    
     sigaction(SIGUSR1, &action, NULL);
     sigaction(SIGUSR2, &action, NULL);
 
@@ -132,8 +146,17 @@ void user_signal_handler(int signo)
 void alarm_signal_handler(int signo)
 {
     if (stats.first == 0 && stats.second == 0)
+    {
         c00++;
-    else if (stats.first == 1 && stats.second == 1)
+    } else if (stats.first == 0 && stats.second == 1) 
+    {
+        c01++;
+    } else if (stats.first == 1 && stats.second == 0) 
+    {
+        c10++;
+    } else if (stats.first == 1 && stats.second == 1)
+    {
         c11++;
+    }
     alarm(rand() % 1 + 1);
 }

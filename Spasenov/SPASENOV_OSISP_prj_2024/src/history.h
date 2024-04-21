@@ -2,18 +2,20 @@
 
 #define HISTORY_FILE_PATH "/home/maxim/OSISP/Spasenov/SPASENOV_OSISP_prj_2024/History.txt"
 
-char* historyHandler();
-
-void keyBackspaseHistoryHandler();
-
-void deletePathFromHistory();
-
-char* keyEnterHistoryHandler();
+void writePath(const char* path);
 
 int printHistory();
 
-void keyDownHistoryHandler();
+char* keyEnterHistoryHandler();
 
 void keyUpHistoryHandler();
 
+void keyDownHistoryHandler();
+
+void deletePathFromHistory();
+
+void keyBackspaseHistoryHandler();
+
 WINDOW* createHistoryWindow();
+
+char* historyHandler();

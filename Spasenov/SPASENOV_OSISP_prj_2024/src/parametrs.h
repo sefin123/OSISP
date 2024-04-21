@@ -23,10 +23,6 @@ typedef struct Parametrs {
 
 #define numParametrs 7
 
-void keyUpParametrsHandler();
-
-void keyDownParametrsHandler();
-
 long convertToLong();
 
 time_t convertToTime();
@@ -37,7 +33,13 @@ bool turnFlag(bool flag);
 
 void updateIsTurn();
 
+char* writeValueParametrs(char* input);
+
 void keyEnterParametrsHandler();
+
+void keyUpParametrsHandler();
+
+void keyDownParametrsHandler();
 
 void keyRightParametrsHandler();
 

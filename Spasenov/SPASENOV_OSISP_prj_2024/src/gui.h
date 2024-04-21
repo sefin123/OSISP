@@ -40,6 +40,8 @@
 
 void printNavigation(WINDOW** win, int windowHeight);
 
+void renderWriteWindow(WINDOW **win, const char *input, int cursorPosition);
+
 void renderResultsWindow(WINDOW **win, const char *results[], int numResults, int selectedIndex);
 
 void renderAboutWindow(WINDOW **win);
@@ -48,6 +50,5 @@ void renderParametrsWindow(WINDOW **win, int selectedIndex);
 
 void renderHistoryWindow(WINDOW **win, char* result[], int numResult, int selectedIndex);
 
-void renderWriteWindow(WINDOW **win, const char *result, int cursorPosition);
 
 #endif

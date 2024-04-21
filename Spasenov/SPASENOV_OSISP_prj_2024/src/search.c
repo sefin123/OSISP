@@ -142,14 +142,14 @@ void saveDirectory(const char *path, const char *input, const char *results[],
     closedir(dir);
 }
 
-int printDirectory(const char *input, const char *path, const char *results[], int selectedIndex, int cousorPosition) {
+int printDirectory(const char *input, const char *path, const char *results[], int selectedIndex, int cursorPosition) {
 
     int numResults = 0;
     saveDirectory(path, input, results, &numResults);
 
     qsort(results, numResults, sizeof(const char *), compareFilenames);
 
-    renderWriteWindow(&searchWin, input, cousorPosition);
+    renderWriteWindow(&searchWin, input, cursorPosition);
     renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
     
     return numResults;
@@ -158,7 +158,6 @@ int printDirectory(const char *input, const char *path, const char *results[], i
 void keyDownHandler() {
     if (selectedIndex < numResults - 1) {
         selectedIndex++;
-        renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
     }
 }
 
@@ -166,7 +165,6 @@ void keyUpHandler() {
     if (selectedIndex > 0) {
         if (selectedIndex > numResults) selectedIndex = numResults;
         selectedIndex--;
-        renderResultsWindow(&resultsWin, results, numResults, selectedIndex);
     }
 }
 
