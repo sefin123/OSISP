@@ -243,7 +243,6 @@ void create_producer() {
     } else if (pid == 0) {
         char name[16];
         sprintf(name, "producer_%02d", prod_counter);
-        prctl(PR_SET_NAME, name, 0, 0, 0);
 
         message *msg;
         int counter_added;
@@ -362,9 +361,9 @@ void prepare() {
 
     memset(message_queue, 0, sizeof(queue));
 
-    mutex = sem_open("mutex", (O_RDWR | O_CREAT | O_TRUNC), (S_IRUSR | S_IWUSR), 1);
-    free_msgs = sem_open("free_msgs_sem", O_CREAT, 0666, QUEUE_MAX_SIZE);
-    taken_msgs = sem_open("taken_msgs_sem", O_CREAT, 0666, 0);
+    mutex = sem_open("/mutex", (O_RDWR | O_CREAT | O_TRUNC), (S_IRUSR | S_IWUSR), 1);
+    free_msgs = sem_open("/free_msgs_sem", O_CREAT, 0666, QUEUE_MAX_SIZE);
+    taken_msgs = sem_open("/taken_msgs_sem", O_CREAT, 0666, 0);
 
     if (free_msgs == SEM_FAILED || taken_msgs == SEM_FAILED || mutex == SEM_FAILED) {
         perror("free_msgs/taken_msgs/mutex semaphore");
@@ -400,11 +399,11 @@ void quit() {
 
     sem_close(taken_msgs);
 
-    sem_unlink("mutex");
+    sem_unlink("/mutex");
 
-    sem_unlink("free_msgs_sem");
+    sem_unlink("/free_msgs_sem");
 
-    sem_unlink("taken_msgs_sem");
+    sem_unlink("/taken_msgs_sem");
 
     exit(0);
 }

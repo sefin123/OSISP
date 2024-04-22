@@ -1,12 +1,15 @@
-CFLAGS = -W -Wall -Wno-unused-parameter -Wno-unused-variable -lrt -std=c11 -pedantic
 CC = gcc
+CFLAGS = -W -Wall -Wno-unused-parameter -Wno-unused-variable -std=c11 -pedantic -Werror -ggdb
 
-make: main
+.PHONY: clean
 
-all: clean main
-
-main: main.c
+all: main
+	
+parent: mian.c makefile
 	$(CC) $(CFLAGS) main.c -o main
 
 clean:
-	@if [ -e main ]; then rm -v main; fi
+	rm -f main
+
+run:
+	./main
