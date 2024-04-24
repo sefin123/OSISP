@@ -107,7 +107,8 @@ void renderParametrsWindow(WINDOW** win, int selectedIndex) {
         PARAMETR_SEARCH_SYMBOL_LINKS,
         PARAMETR_SEARCH_BY_SIZE,
         PARAMETR_SEARCH_BY_TIME_MODIFY,
-        PARAMETR_SEARCH_EMPTY_FILES
+        PARAMETR_SEARCH_EMPTY_FILES,
+        PARAMETR_REGULAR_EXPRESSION
     };
 
     int windowHeight, windowWidth;

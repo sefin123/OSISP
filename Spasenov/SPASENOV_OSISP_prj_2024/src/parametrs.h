@@ -1,16 +1,21 @@
 #include "gui.h"
 
-typedef struct sizeFlag{
+typedef struct sizeFlag {
     long size;
     bool isEnable;
     bool isMore;
-}sizeFlag;
+} sizeFlag;
 
-typedef struct timeFlag{
+typedef struct timeFlag {
     time_t time;
     bool isEnable;
     bool isMore;
-}timeFlag;
+} timeFlag;
+
+typedef struct regexFlag {
+    char pattern[MAX_LENGTH];
+    bool isEnable;
+} regexFlag;
 
 typedef struct Parametrs {
     bool fileFlag;
@@ -19,9 +24,10 @@ typedef struct Parametrs {
     sizeFlag* sizeFileFlag;
     timeFlag* timeFileFlag;
     bool emptyFlag;
+    regexFlag* regexFlag;
 } Parametrs;
 
-#define numParametrs 7
+#define numParametrs 8
 
 long convertToLong();
 

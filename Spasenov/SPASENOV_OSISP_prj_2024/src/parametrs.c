@@ -3,7 +3,7 @@
 Parametrs* parametrs;
 WINDOW* parametrsWin;
 WINDOW* writeWin;
-bool isTurnFlags[5] = {true, true, true, false , false};
+bool isTurnFlags[6] = {true, true, true, false, false, false};
 int selectedparametrIndex = 1;
 char sizeFlagInput[MAX_LENGTH] = "";
 char timeFlagInput[MAX_LENGTH] = "";
@@ -75,6 +75,9 @@ void printIsTurnParametr() {
             mvwprintw(parametrsWin, 6, 45, "%s", timeFlagInput);
         }
     }
+    if (isTurnFlags[6]) {
+        mvwprintw(parametrsWin, 8, 45, "%s", parametrs->regexFlag->pattern);
+    }
 }
 
 bool turnFlag(bool flag) {
@@ -88,6 +91,7 @@ void updateIsTurn() {
         isTurnFlags[3] = parametrs->sizeFileFlag->isEnable ? true : false;
         isTurnFlags[4] = parametrs->timeFileFlag->isEnable ? true : false;
         isTurnFlags[5] = parametrs->emptyFlag ? true : false;
+        isTurnFlags[6] = parametrs->regexFlag->isEnable ? true : false;
 }
 
 char* writeValueParametrs(char* input) {
@@ -171,6 +175,10 @@ void keyEnterParametrsHandler() {
         parametrs->emptyFlag = turnFlag(parametrs->emptyFlag);
         isTurnFlags[5] = parametrs->emptyFlag ? true : false;
     }
+    if (selectedparametrIndex == 7) {
+        parametrs->regexFlag->isEnable = turnFlag(parametrs->regexFlag->isEnable);
+        isTurnFlags[6] = parametrs->regexFlag->isEnable ? true : false;
+    } 
 }
 
 void keyUpParametrsHandler() {
@@ -205,6 +213,12 @@ void keyRightParametrsHandler() {
         parametrs->timeFileFlag->isMore = (timeFlagInput[0] == '+') ? true : false;
         printIsTurnParametr();
     }
+
+    if (selectedparametrIndex == 7) {
+        renderWriteWindow(&writeWin, parametrs->regexFlag->pattern, cursorPositionParametrsValue);
+        strcpy(parametrs->regexFlag->pattern, writeValueParametrs(parametrs->regexFlag->pattern));
+        printIsTurnParametr();    
+    }
 }
 
 Parametrs* allocateMemory() {
@@ -227,13 +241,16 @@ Parametrs* allocateMemory() {
  
     parametrs->emptyFlag = false;
 
+    parametrs->regexFlag = malloc(sizeof(regexFlag));
+    parametrs->regexFlag->isEnable = false;
+
     return parametrs;
 }
 
 WINDOW* createParametrsWriteValueWindow() {
     int windowWidth;
     windowWidth = getmaxx(stdscr);
-    WINDOW* win = newwin(search_win_height, windowWidth, 8, 1);
+    WINDOW* win = newwin(search_win_height, windowWidth, 9, 1);
     keypad(win, TRUE);
 
     return win;

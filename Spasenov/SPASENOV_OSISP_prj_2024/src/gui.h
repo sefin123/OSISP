@@ -11,9 +11,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <regex.h>
 
 #define MAX_LENGTH 2048
-#define PARAMETRS_COUNT 7
+#define PARAMETRS_COUNT 8
 #define ABOUT_STRINGS_COUNT 8
 
 #define search_win_height 3
@@ -26,6 +27,7 @@
 #define PARAMETR_SEARCH_BY_SIZE "Search by size(g,m,k,c,w,b)"
 #define PARAMETR_SEARCH_BY_TIME_MODIFY "Search by time modify(s,m,h)"
 #define PARAMETR_SEARCH_EMPTY_FILES "Search empty files"
+#define PARAMETR_REGULAR_EXPRESSION "Search by regular expression"
 
 #define ABOUT_PROGRAMM "NCURSES-BASED SHELL FOR FIND UTILITY WITH HISTORY STORAGE AND EDITING"
 #define ABOUT_F1_WINDOW "F1 - WINDOW FOR SELECT PARAMETRS"

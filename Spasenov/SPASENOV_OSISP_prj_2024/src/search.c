@@ -66,7 +66,22 @@ void processTimeFlag(const char *filePath, const char *input, const char *result
             saveResult(filePath, input, results, numResults);
         }
     }
+}
 
+void processRegex(const char *filePath, const char *input, const char *results[],
+                  int *numResults, Parametrs *param) {
+    regex_t regex;
+    int ret = regcomp(&regex, (const char*)param->regexFlag->pattern, REG_EXTENDED | REG_NOSUB);
+    if (ret != 0) {
+        return;
+    }
+
+    ret = regexec(&regex, filePath, 0, NULL, 0);
+    if (ret == 0) {
+        saveResult(filePath, input, results, numResults);
+    }
+
+    regfree(&regex);
 }
 
 void processEntry(const char *fullPath, const char *input, const char *results[],
@@ -77,6 +92,8 @@ void processEntry(const char *fullPath, const char *input, const char *results[]
             processSizeFlag(fullPath, input, results, numResults, param);
         } else if (param->timeFileFlag->isEnable) {
             processTimeFlag(fullPath, input, results, numResults, param);
+        } else if (param->regexFlag->isEnable) {
+            processRegex(fullPath, input, results, numResults, param);
         } else {
             saveResult(fullPath, input, results, numResults);
         }
@@ -107,9 +124,6 @@ void saveDirectory(const char *path, const char *input, const char *results[],
     struct dirent *entry;
 
     dir = opendir(path);
-    if (dir == NULL) {
-        return;
-    }
 
     while ((entry = readdir(dir)) != NULL) {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {

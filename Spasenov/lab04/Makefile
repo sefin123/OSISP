@@ -5,7 +5,7 @@ CFLAGS = -W -Wall -Wno-unused-parameter -Wno-unused-variable -std=c11 -pedantic 
 
 all: main
 	
-parent: mian.c makefile
+parent: main.c makefile
 	$(CC) $(CFLAGS) main.c -o main
 
 clean:
