@@ -21,6 +21,9 @@ void processTimeFlag(const char *filePath, const char *input,
 void processEntry(const char *fullPath, const char *input,
                   const char *results[], int *numResults, Parametrs *param);
 
+void processRegex(const char *filePath, const char *input,
+                  const char *results[], int *numResults, Parametrs *param);
+
 void processEmptyFile(const char *fullPath, const char *input,
                       const char *results[], int *numResults);
 

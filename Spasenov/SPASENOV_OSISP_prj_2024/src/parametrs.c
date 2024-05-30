@@ -277,9 +277,6 @@ Parametrs* parametrsHandler(Parametrs *param) {
     
     while (true) {
         int ch = wgetch(parametrsWin);
-        if (ch == KEY_F(4)) {
-            return parametrs;
-        }
         if (ch == KEY_UP) {
             keyUpParametrsHandler();
         }
@@ -291,6 +288,9 @@ Parametrs* parametrsHandler(Parametrs *param) {
         }
         if (ch == KEY_RIGHT) {
             keyRightParametrsHandler();
+        }   
+        if (ch == KEY_F(4)) {
+            return parametrs;
         }
         renderParametrsWindow(&parametrsWin, selectedparametrIndex);
         printIsTurnParametr();
