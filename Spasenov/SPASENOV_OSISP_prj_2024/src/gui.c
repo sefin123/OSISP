@@ -140,7 +140,7 @@ void renderHistoryWindow(WINDOW** win, char* result[], int numResult, int select
     int windowHeight, windowWidth, scrollOffset = 0;
     getmaxyx(stdscr, windowHeight, windowWidth);
 
-    wresize(*win,windowHeight, windowWidth);
+    wresize(*win, windowHeight, windowWidth);
     wclear(*win);
     box(*win, 0, 0);
 

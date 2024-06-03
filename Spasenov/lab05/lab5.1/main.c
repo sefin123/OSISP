@@ -49,9 +49,7 @@ typedef struct{
     int count_extracted;
 }queue;
 
-
 queue *message_queue;
-
 
 uint8_t getSize(){
     int size = 0;
@@ -349,7 +347,7 @@ void inc_queue_func(){
 
 int main(){
 
-start();
+    start();
 
     printf("Write 'u' to see usage.\n");
 

@@ -298,3 +298,4 @@ Parametrs* parametrsHandler(Parametrs *param) {
     delwin(parametrsWin);
     endwin();
 }
+

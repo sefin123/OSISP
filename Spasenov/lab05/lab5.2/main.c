@@ -156,7 +156,7 @@ void viewStatus(){
 
 int addMessage(message* msg){
 
-pthread_mutex_lock(&mutex1);
+    pthread_mutex_lock(&mutex1);
     while((message_queue->count_added-message_queue->count_extracted)>=CURRENT_MAX_QUEUE_SIZE){
         pthread_cond_wait(&full, &mutex1);
     }

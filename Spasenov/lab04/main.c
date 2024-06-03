@@ -192,7 +192,7 @@ int add_message(message *msg) {
         return -1;
     }
 
-    if (message_queue->counter_added - message_queue->counter_extracted == 0) { // если очередь пуста
+    if (message_queue->counter_added - message_queue->counter_extracted == 0) {
         message_queue->buffer[0] = *msg;
         message_queue->head = &message_queue->buffer[0];
         message_queue->head = &message_queue->buffer[0];

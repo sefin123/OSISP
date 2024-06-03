@@ -12,6 +12,7 @@ int compare(const void* a, const void* b) {
 
 void* sorting(void* thread) {
     threadArgs* args = (threadArgs*)thread;
+    pthread_barrier_wait(&barrier);
 
     printf("Qsort in %d thread.\n", args->threadNum);
     while(cur < args->buf + size) {
@@ -32,6 +33,7 @@ void* sorting(void* thread) {
     printf("Merging in %d thread.\n", args->threadNum);
     int mergeStep = 2;
     while (mergeStep <= blocks) {
+        pthread_barrier_wait(&barrier);
         cur = args->buf;
 
         while (cur < args->buf + size) {
